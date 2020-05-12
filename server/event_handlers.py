@@ -26,5 +26,4 @@ def schedule(event):
             cd /path/to/work/dir
         """
         res = subprocess.check_output('squeue').strip()
-        print(res, file=sys.stderr)
-        print 'a'
+        print res
