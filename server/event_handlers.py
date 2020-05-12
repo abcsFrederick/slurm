@@ -1,5 +1,6 @@
 import subprocess
 import datetime
+import sys
 
 
 def schedule(event):
