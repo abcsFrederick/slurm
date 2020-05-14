@@ -25,7 +25,7 @@ def schedule(event):
 
             cd /path/to/work/dir
         """
-        res = Popen(['sbatch','test.sh'], stdout=PIPE, stderr=PIPE).strip()
+        res = Popen(['sbatch','test.sh'], stdout=PIPE, stderr=PIPE)
         retcode = res.wait()
         out = res.stdout.read()
         if retcode == 0:
