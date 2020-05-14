@@ -1,4 +1,4 @@
-import subprocess
+from subprocess import Popen
 import datetime
 import sys
 
@@ -25,5 +25,10 @@ def schedule(event):
 
             cd /path/to/work/dir
         """
-        res = subprocess.check_output('squeue').strip()
-        print res
+        res = Popen(['sbatch','test.sh'], stdout=subprocess.PIPE, stderr=subprocess.PIPE).strip()
+        retcode = process.wait()
+        out = process.stdout.read()
+        if retcode == 0:
+            print 'finished'
+            print out
+        print 'asyc continue'
