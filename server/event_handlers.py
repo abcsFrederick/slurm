@@ -1,6 +1,8 @@
 from subprocess import Popen, PIPE
 import datetime
 import sys
+from girder_jobs.constants import JobStatus
+from girder_jobs.models.job import Job
 
 
 def schedule(event):
@@ -11,6 +13,8 @@ def schedule(event):
     """
     job = event.info
     if job['handler'] == 'slurm_handler':
+
+        Job().updateJob(job, status=JobStatus.QUEUED)
 
         batchscript = """
             #! /bin/bash
@@ -25,10 +29,14 @@ def schedule(event):
 
             cd /path/to/work/dir
         """
-        res = Popen(['sbatch','test.sh'], stdout=PIPE, stderr=PIPE)
-        retcode = res.wait()
-        out = res.stdout.read()
-        if retcode == 0:
-            print 'finished'
-            print out
+        try:
+            res = Popen(['sbatch','test.sh'], stdout=PIPE, stderr=PIPE)
+            retcode = res.wait()
+            Job().updateJob(job, status=JobStatus.RUNNING)
+            while not retcode:
+                retcode = res.wait()
+            Job().updateJob(job, status=JobStatus.SUCCESS)
+            out = res.stdout.read()
+        except Exception:
+            print 'something wrong during slurm'
         print 'asyc continue'
