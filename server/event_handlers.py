@@ -12,26 +12,32 @@ def schedule(event):
     handler field set to "worker_handler".
     """
     job = event.info
+    # shellScript = job['shellScript']
     if job['handler'] == 'slurm_handler':
 
         Job().updateJob(job, status=JobStatus.QUEUED)
 
         batchscript = """
             #! /bin/bash
-            #SBATCH --partition=norm
-            #SBATCH --job-name=Test
-            #SBATCH --time=100-00:00:00
+            #SBATCH --partition=gpu
+            #SBATCH --job-name={name}
             #SBATCH --nodes=1
-            #SBATCH --ntasks=16
+            #SBATCH --ntasks=2
+            #SBATCH --gres=gpu:p100:1
             #SBATCH --mem-per-cpu=32gb
             #SBATCH --mail-type=END
-            #SBATCH --error=/path/to/error/file 
-
-            cd /path/to/work/dir
+            #SBATCH --output={log_dir}/{name}/%J.out
+            #SBATCH --error={log_dir}/{name}/%J.err
         """
+        script = batchscript.format(name=job['name'],
+                                    log_dir='/mnt')
         try:
-            res = Popen(['sbatch','test.sh'], stdout=PIPE, stderr=PIPE)
-            retcode = res.wait()
+
+            # res = Popen(['sbatch','test.sh'], stdout=PIPE, stderr=PIPE)
+            # retcode = res.wait()
+            job['slurmJobId'] = 'temp'
+            job['type'] = 'slurm'
+            job['log'] = ''
             Job().updateJob(job, status=JobStatus.RUNNING)
             while not retcode:
                 retcode = res.wait()

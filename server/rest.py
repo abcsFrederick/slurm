@@ -1,5 +1,6 @@
 from bson import ObjectId
 import os
+from subprocess import Popen, PIPE
 
 from girder import events
 from girder.api.rest import Resource
@@ -16,6 +17,7 @@ class Slurm(Resource):
         self.resourceName = 'slurm'
 
         self.route('GET', (), self.getSlurm)
+        self.route('PUT', ('cancel', ':id'), self.cancelSlurm)
 
     # Find link record based on original item ID or parentId(to check chirdren links)
     # Return only record that have READ access(>=0) to user.
@@ -29,24 +31,43 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def getSlurm(self):
-        now = datetime.datetime.utcnow()
-        job = {
-            'title': 'slurm job',
-            'type': 'slurm',
-            'args': (),
-            'kwargs': {},
-            'created': now,
-            'updated': now,
-            'when': now,
-            'interval': 0,
-            'status': 1,
-            'progress': None,
-            'log': [],
-            'meta': {},
-            'handler': 'slurm_handler',
-            'async': False,
-            'timestamps': [],
-            'parentId': None
-        }
-        events.trigger('jobs.schedule', info=job)
+        res = Popen(['squeue','-u',hostname], stdout=PIPE, stderr=PIPE)
+        retcode = res.wait()
+        while not retcode:
+            retcode = res.wait()
+        # get squeue info
+        pass
+        # now = datetime.datetime.utcnow()
+        # job = {
+        #     'title': 'slurm job',
+        #     'type': 'slurm',
+        #     'args': (),
+        #     'kwargs': {},
+        #     'created': now,
+        #     'updated': now,
+        #     'when': now,
+        #     'interval': 0,
+        #     'status': 1,
+        #     'progress': None,
+        #     'log': [],
+        #     'meta': {},
+        #     'handler': 'slurm_handler',
+        #     'async': False,
+        #     'timestamps': [],
+        #     'parentId': None
+        # }
+        # events.trigger('jobs.schedule', info=job)
 
+    @access.public
+    @autoDescribeRoute(
+        Description('Search for segmentation by certain properties.')
+        .notes('You must pass a "parentId" field to specify which parent folder'
+               'you are searching for children folders and items segmentation information.')
+        .errorResponse()
+        .errorResponse('Read access was denied on the parent resource.', 403)
+    )
+    def cancelSlurm(self):
+        res = Popen(['scancel',''], stdout=PIPE, stderr=PIPE)
+        retcode = res.wait()
+        while not retcode:
+            retcode = res.wait()
