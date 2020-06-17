@@ -32,7 +32,7 @@ class Slurm(Resource):
     )
     def getSlurm(self):
         hostname = ''
-        res = Popen(['squeue','-u',hostname], stdout=PIPE, stderr=PIPE)
+        res = Popen(['squeue'], stdout=PIPE, stderr=PIPE)
         for line in res.stdout:
             line = line.rstrip()
         #     print(line)
