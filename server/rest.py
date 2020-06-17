@@ -35,7 +35,7 @@ class Slurm(Resource):
         res = Popen(['squeue'], stdout=PIPE, stderr=PIPE)
         for line in res.stdout:
             line = line.rstrip()
-        #     print(line)
+            print(line)
         # retcode = res.wait()
         # while not retcode:
         #     retcode = res.wait()
