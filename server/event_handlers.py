@@ -1,8 +1,9 @@
 from subprocess import Popen, PIPE
 import datetime
 import sys
-from girder_jobs.constants import JobStatus
-from girder_jobs.models.job import Job
+
+from girder.constants import JobStatus
+from girder.models.job import Job
 
 
 def schedule(event):
