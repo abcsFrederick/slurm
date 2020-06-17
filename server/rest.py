@@ -31,6 +31,7 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def getSlurm(self):
+        hostname = ''
         res = Popen(['squeue','-u',hostname], stdout=PIPE, stderr=PIPE)
         retcode = res.wait()
         while not retcode:
