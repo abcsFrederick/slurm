@@ -33,11 +33,14 @@ class Slurm(Resource):
     def getSlurm(self):
         hostname = ''
         res = Popen(['squeue','-u',hostname], stdout=PIPE, stderr=PIPE)
-        retcode = res.wait()
-        while not retcode:
-            retcode = res.wait()
+        for line in res.stdout:
+            line = line.rstrip()
+        #     print(line)
+        # retcode = res.wait()
+        # while not retcode:
+        #     retcode = res.wait()
         # get squeue info
-        pass
+        # pass
         # now = datetime.datetime.utcnow()
         # job = {
         #     'title': 'slurm job',
