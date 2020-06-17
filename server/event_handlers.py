@@ -3,7 +3,7 @@ import datetime
 import sys
 
 from girder.plugins.jobs.constants import JobStatus
-from girder.plugins.jobs.models import Job
+from girder.plugins.jobs.models.job import Job
 
 
 def schedule(event):
