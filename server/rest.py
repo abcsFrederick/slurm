@@ -36,6 +36,7 @@ class Slurm(Resource):
         for line in res.stdout:
             line = line.rstrip()
             print(line)
+        return res.stdout
         # retcode = res.wait()
         # while not retcode:
         #     retcode = res.wait()
