@@ -18,7 +18,7 @@ class Slurm(Resource):
 
         self.route('GET', (), self.getSlurm)
         self.route('PUT', ('cancel', ':id'), self.cancelSlurm)
-
+        self.route('POST', (), self.submitSlurmJob)
     # Find link record based on original item ID or parentId(to check chirdren links)
     # Return only record that have READ access(>=0) to user.
     # @access.user(scope=TokenScope.DATA_READ)
@@ -37,31 +37,6 @@ class Slurm(Resource):
             line = line.rstrip()
             print(line)
         return res.stdout
-        # retcode = res.wait()
-        # while not retcode:
-        #     retcode = res.wait()
-        # get squeue info
-        # pass
-        # now = datetime.datetime.utcnow()
-        # job = {
-        #     'title': 'slurm job',
-        #     'type': 'slurm',
-        #     'args': (),
-        #     'kwargs': {},
-        #     'created': now,
-        #     'updated': now,
-        #     'when': now,
-        #     'interval': 0,
-        #     'status': 1,
-        #     'progress': None,
-        #     'log': [],
-        #     'meta': {},
-        #     'handler': 'slurm_handler',
-        #     'async': False,
-        #     'timestamps': [],
-        #     'parentId': None
-        # }
-        # events.trigger('jobs.schedule', info=job)
 
     @access.public
     @autoDescribeRoute(
@@ -76,3 +51,23 @@ class Slurm(Resource):
         retcode = res.wait()
         while not retcode:
             retcode = res.wait()
+
+    @access.public
+    @autoDescribeRoute(
+        Description('Search for segmentation by certain properties.')
+        .notes('You must pass a "parentId" field to specify which parent folder'
+               'you are searching for children folders and items segmentation information.')
+        .errorResponse()
+        .errorResponse('Read access was denied on the parent resource.', 403)
+    )
+    def submitSlurmJob(self):
+        res = Popen(['sbatch','test.sh'], stdout=PIPE, stderr=PIPE)
+        script = '''#!/bin/bash
+                    for (( i=60; i>0; i--)); do
+                      sleep 1 &
+                      printf " $i \n"
+                      wait
+                    done
+                 '''
+        with open('', "w") as sh:
+            sh.write(script)
