@@ -68,7 +68,7 @@ class Slurm(Resource):
                       wait
                     done
                  '''
-        with open('', "w") as sh:
+        with open('./test.sh', "w") as sh:
             sh.write(script)
         print sh.name
         res = Popen(['sbatch',sh.name])
