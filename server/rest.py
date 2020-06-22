@@ -68,11 +68,14 @@ class Slurm(Resource):
 #SBATCH --ntasks=1
 #SBATCH --time=10:00
 #SBATCH --mem-per-cpu=100
-for (( i=60; i>0; i--)); do
-  sleep 1 &
-  printf " $i "
-  wait
-done
+
+#for (( i=60; i>0; i--)); do
+#  sleep 1 &
+#  printf " $i "
+#  wait
+#done
+
+python3 test.py
 '''
         with open('./test.sh', "w") as sh:
             sh.write(script)
