@@ -70,7 +70,7 @@ class Slurm(Resource):
 #SBATCH --mem-per-cpu=100
 for (( i=60; i>0; i--)); do
   sleep 1 &
-  printf " $i /\n"
+  printf " $i "
   wait
 done
 '''
