@@ -61,7 +61,13 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def submitSlurmJob(self):
-        script = '''#!/bin/bash
+        script = '''#!/bin/bash             
+                    #SBATCH --job-name=ssr
+                    #SBATCH --output=hello.log
+                    #
+                    #SBATCH --ntasks=1
+                    #SBATCH --time=10:00
+                    #SBATCH --mem-per-cpu=100
                     for (( i=60; i>0; i--)); do
                       sleep 1 &
                       printf " $i \n"
@@ -71,6 +77,7 @@ class Slurm(Resource):
         with open('./test.sh', "w") as sh:
             sh.write(script)
         print sh.name
+        print os.path.abspath(sh.name)
         res = Popen(['sbatch',sh.name])
         for line in res.stdout:
             line = line.rstrip()
