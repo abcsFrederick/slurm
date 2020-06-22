@@ -78,7 +78,7 @@ done
             sh.write(script)
         print sh.name
         print os.path.abspath(sh.name)
-        res = Popen(['sbatch',sh.name])
+        res = Popen(['sbatch','/home/miaot2/test.sh'])
         for line in res.stdout:
             line = line.rstrip()
             print(line)
