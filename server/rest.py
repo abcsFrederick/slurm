@@ -71,3 +71,9 @@ class Slurm(Resource):
                  '''
         with open('', "w") as sh:
             sh.write(script)
+            print sh.name
+        Popen(['sbatch',sh.name])
+        for line in res.stdout:
+            line = line.rstrip()
+            print(line)
+        return res.stdout
