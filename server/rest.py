@@ -62,18 +62,18 @@ class Slurm(Resource):
     )
     def submitSlurmJob(self):
         script = '''#!/bin/bash             
-                    #SBATCH --job-name=ssr
-                    #SBATCH --output=hello.log
-                    #
-                    #SBATCH --ntasks=1
-                    #SBATCH --time=10:00
-                    #SBATCH --mem-per-cpu=100
-                    for (( i=60; i>0; i--)); do
-                      sleep 1 &
-                      printf " $i \n"
-                      wait
-                    done
-                 '''
+#SBATCH --job-name=ssr
+#SBATCH --output=hello.log
+#
+#SBATCH --ntasks=1
+#SBATCH --time=10:00
+#SBATCH --mem-per-cpu=100
+for (( i=60; i>0; i--)); do
+  sleep 1 &
+  printf " $i /\n"
+  wait
+done
+'''
         with open('./test.sh', "w") as sh:
             sh.write(script)
         print sh.name
