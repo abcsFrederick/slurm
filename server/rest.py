@@ -61,7 +61,6 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def submitSlurmJob(self):
-        res = Popen(['sbatch','test.sh'], stdout=PIPE, stderr=PIPE)
         script = '''#!/bin/bash
                     for (( i=60; i>0; i--)); do
                       sleep 1 &
