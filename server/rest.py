@@ -8,6 +8,7 @@ from girder.api.describe import Description, autoDescribeRoute
 from girder.api import access
 from girder.constants import AccessType, TokenScope
 from . import event_handlers
+from .constants import PluginSettings
 import datetime
 
 
@@ -77,10 +78,35 @@ class Slurm(Resource):
 
 python3 test.py
 '''
-        with open('./test.sh', "w") as sh:
+        slurmJobName = 'test'
+        # shared_partition_log = os.path.join(PluginSettings.SHARED_PARTITION,'log')
+        # shared_partition_output = os.path.join(PluginSettings.SHARED_PARTITION,'output')
+        # logPath = shared_partition
+        path = os.path.dirname(os.path.abspath(__file__))
+        pythonScriptPath = os.path.join(path, 'test.py')
+        script = '''#!/bin/bash
+#SBATCH --job-name={name}
+#SBATCH --output={shared_partition_log}/slurm-$J.out
+mkdir -p {shared_partition_output}/slurm-$J
+python {pythonScriptPath} --output {shared_partition_output}/slurm-$J
+'''
+        script = script.format(name=slurmJobName,
+                               shared_partition_log=shared_partition_log,
+                               shared_partition_output=shared_partition_output,
+                               pythonScriptPath=pythonScriptPath,
+                               logPath=logPath)
+        shellScriptPath = os.path.join(path, 'test.sh')
+        with open(shellScriptPath, "w") as sh:
             sh.write(script)
-        res = Popen(['sbatch', sh.name], stdout=PIPE, stderr=PIPE)
-        for line in res.stdout:
-            line = line.rstrip()
-            print(line)
-        return res.stdout
+        # res = Popen(['chmod', '755', sh.name], stdout=PIPE, stderr=PIPE)
+        res = Popen([sh.name], stdout=PIPE, stderr=PIPE)
+
+        events.trigger('cron.watch', path=PluginSettings.SHARED_PARTITION)
+
+
+        # slurmJob = {'id': jobId,
+        #             'handler': 'slurm',
+        #             'name': slurmJobName,
+        #             'script': script,
+        #             'status': 2,
+        #             'timestamps':[]}

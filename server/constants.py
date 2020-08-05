@@ -1,3 +1,3 @@
 class PluginSettings(object):
-    Partation = 'SSR_task.Mount'
+    SHARED_PARTITION = 'slurm.SHARED_PARTITION'
 
