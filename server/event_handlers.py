@@ -49,14 +49,15 @@ def schedule(event):
             print 'something wrong during slurm'
         print 'asyc continue'
 def watch(event):
-    cron = CronTab(tab='* * * * * squeue -u miaot2 >> /home/miaot2/slurm/log/replacedByJobId.log 2>&1\n', log='/home/miaot2/slurm/log/replacedByJobId.log')
-    job = cron[0]
-    job.set_comment('testing')
-    job.minute.every(1)
+    jobId = event.info['jobId']
+    # cron = CronTab(tab='* * * * * squeue -u miaot2 >> /home/miaot2/slurm/log/replacedByJobId.log 2>&1\n', log='/home/miaot2/slurm/log/replacedByJobId.log')
+    # job = cron[0]
+    # job.set_comment('testing')
+    # job.minute.every(1)
 
-    for result in cron.run_scheduler(cadence=1, warp=True):
-        with cron.log as log:
-            lines = list(log.readlines())
-            print(lines[0][-1])
-            re.search(jobId,lines[0][-1])
+    # for result in cron.run_scheduler(cadence=1, warp=True):
+    #     with cron.log as log:
+    #         lines = list(log.readlines())
+    #         print(lines[0][-1])
+    #         re.search(jobId,lines[0][-1])
 

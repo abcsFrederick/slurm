@@ -1,6 +1,6 @@
 from bson import ObjectId
 import os
-from subprocess import Popen, PIPE
+import subprocess
 
 from girder import events
 from girder.api.rest import Resource
@@ -102,9 +102,13 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$J
         args = ['sbatch']
         args.append(sh.name)
         res = subprocess.check_output(args).strip()
-        print(res, file=sys.stderr)
+        print res
 
-        events.trigger('cron.watch', path=PluginSettings.SHARED_PARTITION)
+        if not res.startswith(b"Submitted batch"):
+            return None
+        jobId = int(res.split()[-1])
+        return jobId
+        events.trigger('cron.watch', jobId=jobId)
 
 
         # slurmJob = {'id': jobId,
