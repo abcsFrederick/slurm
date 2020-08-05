@@ -79,8 +79,8 @@ class Slurm(Resource):
 python3 test.py
 '''
         slurmJobName = 'test'
-        # shared_partition_log = os.path.join(PluginSettings.SHARED_PARTITION,'log')
-        # shared_partition_output = os.path.join(PluginSettings.SHARED_PARTITION,'output')
+        shared_partition_log = os.path.join(PluginSettings.SHARED_PARTITION,'log')
+        shared_partition_output = os.path.join(PluginSettings.SHARED_PARTITION,'output')
         # logPath = shared_partition
         path = os.path.dirname(os.path.abspath(__file__))
         pythonScriptPath = os.path.join(path, 'test.py')
@@ -93,13 +93,16 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$J
         script = script.format(name=slurmJobName,
                                shared_partition_log=shared_partition_log,
                                shared_partition_output=shared_partition_output,
-                               pythonScriptPath=pythonScriptPath,
-                               logPath=logPath)
+                               pythonScriptPath=pythonScriptPath)
         shellScriptPath = os.path.join(path, 'test.sh')
         with open(shellScriptPath, "w") as sh:
             sh.write(script)
         # res = Popen(['chmod', '755', sh.name], stdout=PIPE, stderr=PIPE)
-        res = Popen([sh.name], stdout=PIPE, stderr=PIPE)
+        # res = Popen([sh.name], stdout=PIPE, stderr=PIPE)
+        args = ['sbatch']
+        args.append(sh.name)
+        res = subprocess.check_output(args).strip()
+        print(res, file=sys.stderr)
 
         events.trigger('cron.watch', path=PluginSettings.SHARED_PARTITION)
 
