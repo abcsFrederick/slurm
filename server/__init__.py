@@ -13,7 +13,7 @@ def validateString(doc):
     pass
 
 SettingDefault.defaults.update({
-    PluginSettings.SHARED_PARTITION: '/mnt/hpc/webdata/server/fr-s-ivg-ssr-p1' # hostname
+    PluginSettings.SHARED_PARTITION: '/mnt/hpc/webdata/server/fr-s-ivg-ssr-d1' # hostname
 })
 
 def load(info):
