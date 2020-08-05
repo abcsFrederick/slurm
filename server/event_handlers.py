@@ -28,8 +28,8 @@ def schedule(event):
             #SBATCH --gres=gpu:p100:1
             #SBATCH --mem-per-cpu=32gb
             #SBATCH --mail-type=END
-            #SBATCH --output={log_dir}/{name}/%J.out
-            #SBATCH --error={log_dir}/{name}/%J.err
+            #SBATCH --output={log_dir}/{name}/%j.out
+            #SBATCH --error={log_dir}/{name}/%j.err
         """
         script = batchscript.format(name=job['name'],
                                     log_dir='/mnt')
