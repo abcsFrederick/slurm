@@ -113,7 +113,7 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
             return None
         jobId = int(res.split()[-1])
 
-        events.trigger('cron.watch', jobId=jobId)
+        events.trigger('cron.watch', {'jobId': jobId})
 
 
         # slurmJob = {'id': jobId,
