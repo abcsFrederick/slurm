@@ -15,7 +15,7 @@ def validateString(doc):
 
 SettingDefault.defaults.update({
     PluginSettings.SHARED_PARTITION: '/mnt/hpc/webdata/server/fr-s-ivg-ssr-d1', # hostname
-    PluginSettings.CRONTAB_PARTITION: '/tmp/crontab' # hostname
+    PluginSettings.CRONTAB_PARTITION: '/mnt/data/fr-s-ivg-infv-p/tmp/crontab' # hostname
 })
 
 def load(info):
