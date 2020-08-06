@@ -4,7 +4,7 @@ import { exposePluginConfig } from 'girder/utilities/PluginUtils';
 
 import ConfigView from './views/configuration/configView';
 
-exposePluginConfig('Slurm', 'plugins/Slurm/config');
-router.route('plugins/Slurm/config', 'SlurmConfig', function () {
+exposePluginConfig('slurm', 'plugins/slurm/config');
+router.route('plugins/slurm/config', 'slurmConfig', function () {
     events.trigger('g:navigateTo', ConfigView);
 });

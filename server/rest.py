@@ -3,6 +3,7 @@ import os
 import subprocess
 
 from girder import events
+from girder.models.setting import Setting
 from girder.api.rest import Resource
 from girder.api.describe import Description, autoDescribeRoute
 from girder.api import access
@@ -126,8 +127,6 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$j
     def getSettings(self):
         settings = Setting()
         return {
-            PluginSettings.GIRDER_WORKER_TMP:
-                settings.get(PluginSettings.GIRDER_WORKER_TMP),
-            PluginSettings.TASKS:
-                settings.get(PluginSettings.TASKS),
+            PluginSettings.SHARED_PARTITION:
+                settings.get(PluginSettings.SHARED_PARTITION)
         }
