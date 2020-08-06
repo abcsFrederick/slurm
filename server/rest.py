@@ -83,8 +83,8 @@ python3 test.py
 '''
         slurmJobName = 'test'
         SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
-        shared_partition_log = os.path.join(SHARED_PARTITION, 'log')
-        shared_partition_output = os.path.join(SHARED_PARTITION, 'output')
+        shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
+        shared_partition_output = os.path.join(SHARED_PARTITION, 'outputs')
         print SHARED_PARTITION
         # logPath = shared_partition
         path = os.path.dirname(os.path.abspath(__file__))
