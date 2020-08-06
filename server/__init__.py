@@ -7,13 +7,15 @@ from .constants import PluginSettings
 
 
 @setting_utilities.validator({
-    PluginSettings.SHARED_PARTITION
+    PluginSettings.SHARED_PARTITION,
+    PluginSettings.CRONTAB_PARTITION
 })
 def validateString(doc):
     pass
 
 SettingDefault.defaults.update({
-    PluginSettings.SHARED_PARTITION: '/mnt/hpc/webdata/server/fr-s-ivg-ssr-d1' # hostname
+    PluginSettings.SHARED_PARTITION: '/mnt/hpc/webdata/server/fr-s-ivg-ssr-d1', # hostname
+    PluginSettings.CRONTAB_PARTITION: '/tmp/crontab' # hostname
 })
 
 def load(info):

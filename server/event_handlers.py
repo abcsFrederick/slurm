@@ -1,9 +1,10 @@
 from subprocess import Popen, PIPE
 import datetime
-import sys
+import sys, os
 import re
 from crontab import CronTab
 
+from girder.models.setting import Setting
 from girder.plugins.jobs.constants import JobStatus
 from girder.plugins.jobs.models.job import Job
 
@@ -49,15 +50,18 @@ def schedule(event):
             print 'something wrong during slurm'
         print 'asyc continue'
 def watch(event):
+    CRONTAB_PARTITION = settings.get(PluginSettings.CRONTAB_PARTITION)
+    logPath = os.path.join(CRONTAB_PARTITION, jobId)
     jobId = event.info['jobId']
-    # cron = CronTab(tab='* * * * * squeue -u miaot2 >> /home/miaot2/slurm/log/replacedByJobId.log 2>&1\n', log='/home/miaot2/slurm/log/replacedByJobId.log')
-    # job = cron[0]
-    # job.set_comment('testing')
-    # job.minute.every(1)
+    cron = CronTab(tab='* * * * * squeue -j ' + jobId + ' >> ' + logPath + ' 2>&1\n', log=logPath)
+    job = cron[0]
+    job.set_comment('testing')
+    job.minute.every(1)
 
-    # for result in cron.run_scheduler(cadence=1, warp=True):
-    #     with cron.log as log:
-    #         lines = list(log.readlines())
-    #         print(lines[0][-1])
-    #         re.search(jobId,lines[0][-1])
+    for result in cron.run_scheduler(cadence=1, warp=True):
+        with cron.log as log:
+            lines = list(log.readlines())
+            if re.search(jobId,lines[0][-1]) is None:
+                print 'slurm job finished'
+                break
 

@@ -108,12 +108,11 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
         args = ['sbatch']
         args.append(sh.name)
         res = subprocess.check_output(args).strip()
-        print res
 
         if not res.startswith(b"Submitted batch"):
             return None
         jobId = int(res.split()[-1])
-        return jobId
+
         events.trigger('cron.watch', jobId=jobId)
 
 
@@ -131,5 +130,7 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
         settings = Setting()
         return {
             PluginSettings.SHARED_PARTITION:
-                settings.get(PluginSettings.SHARED_PARTITION)
-        }
+                settings.get(PluginSettings.SHARED_PARTITION),
+            PluginSettings.CRONTAB_PARTITION:
+                settings.get(PluginSettings.CRONTAB_PARTITION)
+            }

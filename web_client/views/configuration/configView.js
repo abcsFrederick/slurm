@@ -19,13 +19,15 @@ var ConfigView = View.extend({
             this._saveSettings([{
                 key: 'slurm.SHARED_PARTITION',
                 value: this.$('#g-Slurm-settings-SHARED').val()
+            }, {
+                key: 'slurm.CRONTAB_PARTITION',
+                value: this.$('#g-Slurm-settings-CRONTAB').val()
             }]);
         }
     },
 
     initialize: function () {
         ConfigView.getSettings((settings) => {
-            console.log(settings)
             this.settings = settings;
             this.render();
         });
@@ -72,7 +74,7 @@ var ConfigView = View.extend({
                 timeout: 4000
             });
         }).fail((resp) => {
-            this.$('#g-Slurm-settinsge-error-message').text(
+            this.$('#g-Slurm-settings-error-message').text(
                 resp.responseJSON.message
             );
         });
