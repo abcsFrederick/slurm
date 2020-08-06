@@ -1,1 +1,1 @@
-ln -sf $PWD/modules /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/
+cp $PWD/modules /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/
