@@ -50,6 +50,7 @@ def schedule(event):
             print 'something wrong during slurm'
         print 'asyc continue'
 def watch(event):
+    settings = Setting()
     CRONTAB_PARTITION = settings.get(PluginSettings.CRONTAB_PARTITION)
     logPath = os.path.join(CRONTAB_PARTITION, jobId)
     jobId = event.info['jobId']
