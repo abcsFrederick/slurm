@@ -56,7 +56,7 @@ def watch(event):
     jobId = event.info['jobId']
     settings = Setting()
     CRONTAB_PARTITION = settings.get(PluginSettings.CRONTAB_PARTITION)
-    logPath = os.path.join(CRONTAB_PARTITION, jobId)
+    logPath = os.path.join(CRONTAB_PARTITION, str(jobId))
     cron = CronTab(tab='* * * * * squeue -j ' + jobId + ' >> ' + logPath + ' 2>&1\n', log=logPath)
     job = cron[0]
     job.set_comment('testing')
