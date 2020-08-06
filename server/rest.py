@@ -91,9 +91,9 @@ python3 test.py
         pythonScriptPath = os.path.join(modulesPath, 'test.py')
         script = '''#!/bin/bash
 #SBATCH --job-name={name}
-#SBATCH --output={shared_partition_log}/slurm-%x.$SLURM_JOB_ID.out
-mkdir -p {shared_partition_output}/slurm-%x.$SLURM_JOB_ID
-python {pythonScriptPath} --output {shared_partition_output}/slurm-%x.$SLURM_JOB_ID
+#SBATCH --output={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.out
+mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
+python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 '''
         script = script.format(name=slurmJobName,
                                shared_partition_log=shared_partition_log,
