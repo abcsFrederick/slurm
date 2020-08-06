@@ -15,6 +15,7 @@ def main(output):
   f.write('finished \n')
   f.close()
 if __name__ == '__main__':
+  parser = argparse.ArgumentParser()
   parser.add_argument('-o', '--output', help='output.', required=True)
   kwargs = vars(parser.parse_args())
   main(**kwargs)
