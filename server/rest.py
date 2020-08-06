@@ -22,6 +22,7 @@ class Slurm(Resource):
         self.route('PUT', ('cancel', ':id'), self.cancelSlurm)
         self.route('POST', (), self.submitSlurmJob)
         self.route('GET', ('settings',), self.getSettings)
+        self.route('POST', ('update',), self.update)
     # Find link record based on original item ID or parentId(to check chirdren links)
     # Return only record that have READ access(>=0) to user.
     # @access.user(scope=TokenScope.DATA_READ)
@@ -57,7 +58,7 @@ class Slurm(Resource):
 
     @access.public
     @autoDescribeRoute(
-        Description('Search for segmentation by certain properties.')
+        Description('Testing slurm job sumbit')
         .notes('You must pass a "parentId" field to specify which parent folder'
                'you are searching for children folders and items segmentation information.')
         .errorResponse()
@@ -85,8 +86,6 @@ python3 test.py
         SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
         shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
         shared_partition_output = os.path.join(SHARED_PARTITION, 'outputs')
-        print SHARED_PARTITION
-        # logPath = shared_partition
         modulesPath = os.path.join(SHARED_PARTITION, 'modules')
         pythonScriptPath = os.path.join(modulesPath, 'test.py')
         script = '''#!/bin/bash
@@ -134,3 +133,10 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
             PluginSettings.CRONTAB_PARTITION:
                 settings.get(PluginSettings.CRONTAB_PARTITION)
             }
+
+    @access.public
+    @autoDescribeRoute(
+        Description('Update job info on girder when slurm job is finished.')
+    )
+    def update(self):
+        return 'update'
