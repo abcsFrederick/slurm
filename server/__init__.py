@@ -16,7 +16,6 @@ SettingDefault.defaults.update({
     PluginSettings.SHARED_PARTITION: '/mnt/hpc/webdata/server/fr-s-ivg-ssr-d1' # hostname
 })
 
-print PluginSettings
 def load(info):
     info['apiRoot'].slurm = rest.Slurm()
     events.bind('jobs.schedule', 'slurm', event_handlers.schedule)

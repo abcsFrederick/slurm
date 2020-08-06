@@ -20,6 +20,7 @@ class Slurm(Resource):
         self.route('GET', (), self.getSlurm)
         self.route('PUT', ('cancel', ':id'), self.cancelSlurm)
         self.route('POST', (), self.submitSlurmJob)
+        self.route('GET', ('settings',), self.getSettings)
     # Find link record based on original item ID or parentId(to check chirdren links)
     # Return only record that have READ access(>=0) to user.
     # @access.user(scope=TokenScope.DATA_READ)
@@ -118,3 +119,15 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$j
         #             'script': script,
         #             'status': 2,
         #             'timestamps':[]}
+    @access.public
+    @autoDescribeRoute(
+        Description('Getting Slurm task settings.')
+    )
+    def getSettings(self):
+        settings = Setting()
+        return {
+            PluginSettings.GIRDER_WORKER_TMP:
+                settings.get(PluginSettings.GIRDER_WORKER_TMP),
+            PluginSettings.TASKS:
+                settings.get(PluginSettings.TASKS),
+        }
