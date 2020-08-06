@@ -92,7 +92,6 @@ python3 test.py
         script = '''#!/bin/bash
 #SBATCH --job-name={name}
 #SBATCH --output={shared_partition_log}/slurm-%x.%j.out
-mkdir -p {shared_partition_output}/slurm-%x.%j
 python {pythonScriptPath} --output {shared_partition_output}/slurm-%x.%j
 '''
         script = script.format(name=slurmJobName,
