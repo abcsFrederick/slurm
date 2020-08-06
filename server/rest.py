@@ -87,8 +87,8 @@ python3 test.py
         shared_partition_output = os.path.join(SHARED_PARTITION, 'outputs')
         print SHARED_PARTITION
         # logPath = shared_partition
-        path = os.path.dirname(os.path.abspath(__file__))
-        pythonScriptPath = os.path.join(path, 'test.py')
+        path = os.path.join(SHARED_PARTITION, 'modules')
+        pythonScriptPath = os.path.join(path, 'test/test.py')
         script = '''#!/bin/bash
 #SBATCH --job-name={name}
 #SBATCH --output={shared_partition_log}/slurm-%x.%j.out
