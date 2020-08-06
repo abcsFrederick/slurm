@@ -1,6 +1,7 @@
 import time
-import os
-path = os.path.dirname(os.path.abspath(__file__))
+import os, sys
+
+path = sys.argv[1]
 path = os.path.join(path, 'out.log')
 if os.path.exists(path):
   os.remove(path)
