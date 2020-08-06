@@ -8,6 +8,9 @@ from girder.models.setting import Setting
 from girder.plugins.jobs.constants import JobStatus
 from girder.plugins.jobs.models.job import Job
 
+from .constants import PluginSettings
+
+
 def schedule(event):
     """
     This is bound to the "jobs.schedule" event, and will be triggered any time
