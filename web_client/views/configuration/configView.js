@@ -25,6 +25,7 @@ var ConfigView = View.extend({
 
     initialize: function () {
         ConfigView.getSettings((settings) => {
+            console.log(settings)
             this.settings = settings;
             this.render();
         });

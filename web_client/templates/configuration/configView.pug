@@ -6,6 +6,6 @@ form#g-Slurm-settings-form(role="form")
   .form-group
     label.control-label(for="g-SSR-task-settings-SHARED") Shared partition path
     p.g-SSR-task-settings-description
-    input#g-Slurm-settings-SHARED.input-sm.form-control(type="text", value=settings["SSR_task.GIRDER_WORKER_TMP"], title="SHARED PARTITION path in SSR-task.", placeholder="Do not change only if you know what you are doing (default /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1)")
+    input#g-Slurm-settings-SHARED.input-sm.form-control(type="text", value=settings["slurm.SHARED_PARTITION"], title="SHARED PARTITION path in SSR-task.", placeholder="Do not change only if you know what you are doing (default /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1)")
   p#g-Slurm-settings-error-message.g-validation-failed-message
   input.btn.btn-sm.btn-primary(type="submit", value="Save")

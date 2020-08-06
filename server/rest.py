@@ -64,6 +64,7 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def submitSlurmJob(self):
+        settings = Setting()
         script = '''#!/bin/bash             
 #SBATCH --job-name=ssr
 #SBATCH --output=hello.log
@@ -81,9 +82,10 @@ class Slurm(Resource):
 python3 test.py
 '''
         slurmJobName = 'test'
-        shared_partition_log = os.path.join(PluginSettings.SHARED_PARTITION, 'log')
-        shared_partition_output = os.path.join(PluginSettings.SHARED_PARTITION, 'output')
-        print PluginSettings.SHARED_PARTITION
+        SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
+        shared_partition_log = os.path.join(SHARED_PARTITION, 'log')
+        shared_partition_output = os.path.join(SHARED_PARTITION, 'output')
+        print SHARED_PARTITION
         # logPath = shared_partition
         path = os.path.dirname(os.path.abspath(__file__))
         pythonScriptPath = os.path.join(path, 'test.py')
