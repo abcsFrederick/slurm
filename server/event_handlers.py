@@ -53,11 +53,11 @@ def schedule(event):
             print 'something wrong during slurm'
         print 'asyc continue'
 def watch(event):
-    jobId = event.info['jobId']
+    jobId = str(event.info['jobId'])
     settings = Setting()
     CRONTAB_PARTITION = settings.get(PluginSettings.CRONTAB_PARTITION)
-    logPath = os.path.join(CRONTAB_PARTITION, str(jobId))
-    cron = CronTab(tab='* * * * * squeue -j ' + str(jobId) + ' >> ' + logPath + ' 2>&1\n', log=logPath)
+    logPath = os.path.join(CRONTAB_PARTITION, jobId)
+    cron = CronTab(tab='* * * * * squeue -j ' + jobId + ' >> ' + logPath + ' 2>&1\n', log=logPath)
     job = cron[0]
     job.set_comment('testing')
     job.minute.every(1)
@@ -65,7 +65,7 @@ def watch(event):
     for result in cron.run_scheduler(cadence=1, warp=True):
         with cron.log as log:
             lines = list(log.readlines())
-            if re.search(jobId,lines[0][-1]) is None:
+            if re.search(jobId, lines[0][-1]) is None:
                 print 'slurm job finished'
                 break
 
