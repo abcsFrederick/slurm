@@ -94,8 +94,7 @@ class Slurm(Resource):
 
         Job().updateJob(job, status=JobStatus.QUEUED)
 
-        batchscript = """
-            #! /bin/bash
+        batchscript = """#!/bin/bash
             #SBATCH --partition={partition}
             #SBATCH --job-name={name}
             #SBATCH --nodes={nodes}
