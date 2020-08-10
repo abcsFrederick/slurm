@@ -137,7 +137,17 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
     @access.public
     @autoDescribeRoute(
         Description('Update job info on girder when slurm job is finished.')
-        .param('crontabId', 'crontab id for monitoring', required=True)
+        .param('crontabId', 'crontab id for monitoring.', required=True)
+        .param('slurmJobId', 'slurm job id.', required=True)
     )
-    def update(self, crontabId):
-        return crontabId + ' crontab remove and update'
+    def update(self, commentId, slurmJobId):
+        from crontab import CronTab
+
+        cron = CronTab(user=True)
+        list = cron.find_comment(commentId)
+
+        for job in list:
+            cron.remove(job)
+            cron.write()
+
+        return crontabId + ' crontab remove and update ' + slurmJobId + ' slurm job id.'
