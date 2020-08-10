@@ -72,7 +72,8 @@ def watch(event):
 
     CRONTAB_PARTITION = settings.get(PluginSettings.CRONTAB_PARTITION)
     logPath = os.path.join(CRONTAB_PARTITION, jobId)
-    shellPath = os.path.join(CRONTAB_PARTITION, 'crontab.sh')
+    print os.path.dirname(__file__)
+    shellPath = os.path.join(os.path.dirname(__file__), 'crontab.sh')
     randomId = str(random.getrandbits(128))
     cron = CronTab(user=True)
     job = cron.new(command=shellPath + ' ' + jobId + ' ' + randomId + ' >> ' + logPath + ' 2>&1\n')
