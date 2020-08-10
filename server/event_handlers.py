@@ -27,7 +27,7 @@ def schedule(event):
     handler field set to "worker_handler".
     """
     job = event.info
-    slurm_info_new = job['otherFields']['slurm_info']
+    slurm_info_new = job['meta']['slurm_info']
     # shellScript = job['shellScript']
     if job['handler'] == 'slurm_handler' and slurm_info_new['entry'] is not None:
         settings = Setting()
@@ -75,7 +75,7 @@ def schedule(event):
             slurmJobId = int(res.split()[-1])
 
             events.trigger('cron.watch', {'slurmJobId': slurmJobId})
-            job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
+            job['meta']['slurm_info']['slurm_id'] = slurmJobId
             Job().updateJob(job, status=JobStatus.RUNNING)
             
         except Exception:
