@@ -77,46 +77,65 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def submitSlurmJob(self):
+        title = 'slurm test'
+        job = Job().createJob(title=title, type='split',
+                              handler='slurm_handler', user=self.getCurrentUser())
+        job['otherFields']['slurm_info']['name'] = Slurm().name
+        job['otherFields']['slurm_info']['entry'] = 'test.py'
+
         settings = Setting()
-        slurmJobName = 'test'
         SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
         shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
         shared_partition_output = os.path.join(SHARED_PARTITION, 'outputs')
         modulesPath = os.path.join(SHARED_PARTITION, 'modules')
-        pythonScriptPath = os.path.join(modulesPath, 'test.py')
-        script = '''#!/bin/bash
-#SBATCH --job-name={name}
-#SBATCH --output={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.out
-mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
-python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
-'''
-        script = script.format(name=slurmJobName,
-                               shared_partition_log=shared_partition_log,
-                               shared_partition_output=shared_partition_output,
-                               pythonScriptPath=pythonScriptPath)
+        pythonScriptPath = os.path.join(modulesPath, job['otherFields']['slurm_info']['entry'])
+
+        Job().updateJob(job, status=JobStatus.QUEUED)
+
+        batchscript = """
+            #! /bin/bash
+            #SBATCH --partition={partition}
+            #SBATCH --job-name={name}
+            #SBATCH --nodes={nodes}
+            #SBATCH --ntasks={ntasks}
+            #SBATCH --gres={gres}
+            #SBATCH --mem-per-cpu={mem_per_cpu}
+            #SBATCH --output={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.out
+            #SBATCH --error={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.err
+
+            mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
+            python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
+        """
+        script = batchscript.format(name=Slurm().name,
+                                    partition=Slurm().partition,
+                                    nodes=Slurm().nodes,
+                                    ntasks=Slurm().ntasks,
+                                    gres=Slurm().gres,
+                                    mem_per_cpu=Slurm().mem_per_cpu,
+                                    shared_partition_log=shared_partition_log,
+                                    shared_partition_output=shared_partition_output,
+                                    pythonScriptPath=pythonScriptPath)
+
         shellPath = os.path.join(SHARED_PARTITION, 'shells')
         shellScriptPath = os.path.join(shellPath, 'test.sh')
         with open(shellScriptPath, "w") as sh:
             sh.write(script)
-        # res = Popen(['chmod', '755', sh.name], stdout=PIPE, stderr=PIPE)
-        # res = Popen([sh.name], stdout=PIPE, stderr=PIPE)
-        args = ['sbatch']
-        args.append(sh.name)
-        res = subprocess.check_output(args).strip()
+        try:
+            args = ['sbatch']
+            args.append(sh.name)
+            res = subprocess.check_output(args).strip()
+            if not res.startswith(b"Submitted batch"):
+                return None
+            slurmJobId = int(res.split()[-1])
 
-        if not res.startswith(b"Submitted batch"):
-            return None
-        jobId = int(res.split()[-1])
-
-        events.trigger('cron.watch', {'jobId': jobId})
-
-        return jobId
-        # slurmJob = {'id': jobId,
-        #             'handler': 'slurm',
-        #             'name': slurmJobName,
-        #             'script': script,
-        #             'status': 2,
-        #             'timestamps':[]}
+            events.trigger('cron.watch', {'slurmJobId': slurmJobId})
+            job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
+            Job().updateJob(job, status=JobStatus.RUNNING)
+            
+        except Exception:
+            return 'something wrong during slurm start'
+        
+        return slurmJobId
     @access.public
     @autoDescribeRoute(
         Description('Getting Slurm task settings.')
