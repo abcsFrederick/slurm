@@ -80,6 +80,8 @@ class Slurm(Resource):
         title = 'slurm test'
         job = Job().createJob(title=title, type='split',
                               handler='slurm_handler', user=self.getCurrentUser())
+        job['otherFields'] = {}
+        job['otherFields']['slurm_info'] = {}
         job['otherFields']['slurm_info']['name'] = Slurm().name
         job['otherFields']['slurm_info']['entry'] = 'test.py'
 
