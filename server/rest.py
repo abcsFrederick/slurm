@@ -159,6 +159,8 @@ class Slurm(Resource):
     )
     def update(self, slurmJobId, commentId):
         from crontab import CronTab
+        import requests
+        from requests import HTTPError
 
         cron = CronTab(user=True)
         crons = cron.find_comment(commentId)
@@ -167,5 +169,9 @@ class Slurm(Resource):
             cron.remove(cronjob)
             cron.write()
         job = Job().findOne({'otherFields.slurm_info.slurm_id': slurmJobId})
-        Job().updateJob(job, status=JobStatus.SUCCESS)
+        url = 'http://localhost/api/v1/job/' + job['_id']
+        print url
+        req = requests.request('PUT', url, headers={},
+                               data={'status': 3}, allow_redirects=True)
+        req.raise_for_status()
         return commentId + ' crontab remove and update ' + slurmJobId + ' slurm job id.'
