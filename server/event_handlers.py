@@ -25,7 +25,7 @@ def schedule(event):
     """
     job = event.info
     # shellScript = job['shellScript']
-    if job['handler'] == 'slurm_handler' && job['otherFields'] is not None:
+    if job['handler'] == 'slurm_handler' and job['otherFields'] is not None:
         try:
             slurm_info = job['otherFields']['slurm_info']
         except Exception:
