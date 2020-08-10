@@ -10,11 +10,14 @@ from girder.plugins.jobs.models.job import Job
 
 from .constants import PluginSettings
 
-
 '''
-slurm_info = { 'name': 'slurm job name',
-               'entry': 'entry.py'
-
+slurm_info_basic = { 'name': 'test',
+               'entry': 'entry.py',
+               'partition': 'norm',
+               'nodes': 1
+               'ntasks': 2
+               'gres': 'gpu:p100:1'
+               'mem-per-cpu': '32gb'
 }
 '''
 def schedule(event):
@@ -24,36 +27,46 @@ def schedule(event):
     handler field set to "worker_handler".
     """
     job = event.info
+    slurm_info_new = job['otherFields']['slurm_info']
     # shellScript = job['shellScript']
-    if job['handler'] == 'slurm_handler' and job['otherFields'] is not None:
-        try:
-            slurm_info = job['otherFields']['slurm_info']
-        except Exception:
-            return 'Slurm information is not provided'
+    if job['handler'] == 'slurm_handler' and slurm_info_new['entry'] is not None:
+        settings = Setting()
+        SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
+        shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
+        shared_partition_output = os.path.join(SHARED_PARTITION, 'outputs')
+        modulesPath = os.path.join(SHARED_PARTITION, 'modules')
+        pythonScriptPath = os.path.join(modulesPath, slurm_info_new['entry'])
 
-        slurmJobName = slurm_info['name']
         Job().updateJob(job, status=JobStatus.QUEUED)
 
         batchscript = """
             #! /bin/bash
-            #SBATCH --partition=gpu
+            #SBATCH --partition={partition}
             #SBATCH --job-name={name}
-            #SBATCH --nodes=1
-            #SBATCH --ntasks=2
-            #SBATCH --gres=gpu:p100:1
-            #SBATCH --mem-per-cpu=32gb
+            #SBATCH --nodes={nodes}
+            #SBATCH --ntasks={ntasks}
+            #SBATCH --gres={gres}
+            #SBATCH --mem-per-cpu={mem_per_cpu}
             #SBATCH --output={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.out
-            #SBATCH --error={log_dir}/{name}/%j.err
+            #SBATCH --error={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.err
 
             mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
         """
-        script = batchscript.format(name=job['name'],
-                                    log_dir='/mnt')
+        script = batchscript.format(name=slurm_info_new['name'],
+                                    partition=slurm_info_new['partition'],
+                                    nodes=slurm_info_new['nodes'],
+                                    ntasks=slurm_info_new['ntasks'],
+                                    gres=slurm_info_new['gres'],
+                                    mem_per_cpu=slurm_info_new['mem_per_cpu'],
+                                    shared_partition_log=shared_partition_log,
+                                    shared_partition_output=shared_partition_output,
+                                    pythonScriptPath=pythonScriptPath)
+        shellPath = os.path.join(SHARED_PARTITION, 'shells')
+        shellScriptPath = os.path.join(shellPath, slurm_info_new['name'] + '.sh')
+        with open(shellScriptPath, "w") as sh:
+            sh.write(script)
         try:
-
-            # res = Popen(['sbatch','test.sh'], stdout=PIPE, stderr=PIPE)
-            # retcode = res.wait()
             job['slurmJobId'] = 'temp'
             job['type'] = 'slurm'
             job['log'] = ''

@@ -18,6 +18,14 @@ class Slurm(Resource):
         super(Slurm, self).__init__()
         self.resourceName = 'slurm'
 
+        self.name = 'test'
+        self.entry = None
+        self.partition = 'norm'
+        self.nodes = 1
+        self.ntasks = 2
+        self.gres = 'gpu:p100:1'
+        self.mem_per_cpu = '32gb'
+
         self.route('GET', (), self.getSlurm)
         self.route('PUT', ('cancel', ':id'), self.cancelSlurm)
         self.route('POST', (), self.submitSlurmJob)
@@ -66,22 +74,6 @@ class Slurm(Resource):
     )
     def submitSlurmJob(self):
         settings = Setting()
-        script = '''#!/bin/bash             
-#SBATCH --job-name=ssr
-#SBATCH --output=hello.log
-#
-#SBATCH --ntasks=1
-#SBATCH --time=10:00
-#SBATCH --mem-per-cpu=100
-
-#for (( i=60; i>0; i--)); do
-#  sleep 1 &
-#  printf " $i "
-#  wait
-#done
-
-python3 test.py
-'''
         slurmJobName = 'test'
         SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
         shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
