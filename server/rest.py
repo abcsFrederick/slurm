@@ -168,10 +168,11 @@ class Slurm(Resource):
         for cronjob in crons:
             cron.remove(cronjob)
             cron.write()
-        job = Job().findOne({'otherFields.slurm_info.slurm_id': slurmJobId})
-        url = 'http://localhost/api/v1/job/' + job['_id']
-        print url
+        job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})
+        # print job
+        url = 'http://localhost:8888/api/v1/job/' + str(job['_id'])
+        # print url
         req = requests.request('PUT', url, headers={},
                                data={'status': 3}, allow_redirects=True)
-        req.raise_for_status()
+        # req.raise_for_status()
         return commentId + ' crontab remove and update ' + slurmJobId + ' slurm job id.'
