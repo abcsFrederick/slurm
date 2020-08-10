@@ -114,7 +114,7 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
 
         events.trigger('cron.watch', {'jobId': jobId})
 
-
+        return jobId
         # slurmJob = {'id': jobId,
         #             'handler': 'slurm',
         #             'name': slurmJobName,
@@ -137,7 +137,7 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
     @access.public
     @autoDescribeRoute(
         Description('Update job info on girder when slurm job is finished.')
-        .param('crontabId', 'crontab id for monitoring.', required=True)
+        .param('commentId', 'crontab id for monitoring.', required=True)
         .param('slurmJobId', 'slurm job id.', required=True)
     )
     def update(self, commentId, slurmJobId):
@@ -150,4 +150,4 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
             cron.remove(job)
             cron.write()
 
-        return crontabId + ' crontab remove and update ' + slurmJobId + ' slurm job id.'
+        return commentId + ' crontab remove and update ' + slurmJobId + ' slurm job id.'
