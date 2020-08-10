@@ -168,4 +168,4 @@ class Slurm(Resource):
             cron.write()
         job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})
         Job().updateJob(job, status=JobStatus.SUCCESS)
-        return commentId + ' crontab remove and update ' + job['_id'] + ' job status.'
+        return commentId + ' crontab remove and update ' + str(job['_id']) + ' job status.'
