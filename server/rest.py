@@ -8,6 +8,10 @@ from girder.api.rest import Resource
 from girder.api.describe import Description, autoDescribeRoute
 from girder.api import access
 from girder.constants import AccessType, TokenScope
+
+from girder.plugins.jobs.models.job import Job
+from girder.plugins.jobs.constants import JobStatus
+
 from . import event_handlers
 from .constants import PluginSettings
 import datetime
@@ -129,17 +133,18 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
     @access.public
     @autoDescribeRoute(
         Description('Update job info on girder when slurm job is finished.')
-        .param('commentId', 'crontab id for monitoring.', required=True)
         .param('slurmJobId', 'slurm job id.', required=True)
+        .param('commentId', 'crontab id for monitoring.', required=True)
     )
-    def update(self, commentId, slurmJobId):
+    def update(self, slurmJobId, commentId):
         from crontab import CronTab
 
         cron = CronTab(user=True)
-        list = cron.find_comment(commentId)
+        crons = cron.find_comment(commentId)
 
-        for job in list:
-            cron.remove(job)
+        for cronjob in crons:
+            cron.remove(cronjob)
             cron.write()
-
+        job = Job().findOne({'otherFields.slurm_info.slurm_id': slurmJobId})
+        Job().updateJob(job, status=JobStatus.SUCCESS)
         return commentId + ' crontab remove and update ' + slurmJobId + ' slurm job id.'

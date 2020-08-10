@@ -1,4 +1,4 @@
-from subprocess import Popen, PIPE
+import subprocess
 import datetime
 import sys, os
 import re
@@ -67,38 +67,35 @@ def schedule(event):
         with open(shellScriptPath, "w") as sh:
             sh.write(script)
         try:
-            job['slurmJobId'] = 'temp'
-            job['type'] = 'slurm'
-            job['log'] = ''
+            args = ['sbatch']
+            args.append(sh.name)
+            res = subprocess.check_output(args).strip()
+            if not res.startswith(b"Submitted batch"):
+                return None
+            slurmJobId = int(res.split()[-1])
+
+            events.trigger('cron.watch', {'slurmJobId': slurmJobId})
+            job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
             Job().updateJob(job, status=JobStatus.RUNNING)
-            while not retcode:
-                retcode = res.wait()
-            Job().updateJob(job, status=JobStatus.SUCCESS)
-            out = res.stdout.read()
+            
         except Exception:
-            print 'something wrong during slurm'
-        print 'asyc continue'
+            return 'something wrong during slurm start'
+        
+        return slurmJobId
+
 def watch(event):
     import random
-    jobId = str(event.info['jobId'])
+    slurmJobId = str(event.info['slurmJobId'])
     settings = Setting()
 
     CRONTAB_PARTITION = settings.get(PluginSettings.CRONTAB_PARTITION)
-    logPath = os.path.join(CRONTAB_PARTITION, jobId)
-    print os.path.dirname(__file__)
+    logPath = os.path.join(CRONTAB_PARTITION, slurmJobId)
     shellPath = os.path.join(os.path.dirname(__file__), 'crontab.sh')
-    randomId = str(random.getrandbits(128))
+    commentId = str(random.getrandbits(128))
     cron = CronTab(user=True)
-    job = cron.new(command=shellPath + ' ' + jobId + ' ' + randomId + ' >> ' + logPath + ' 2>&1\n')
-
-    job.set_comment(randomId)
+    job = cron.new(command=shellPath + ' ' + slurmJobId + ' ' + commentId + ' >> ' + logPath + ' 2>&1\n')
+    job.set_comment(commentId)
     job.minute.every(1)
     job.enable()
     cron.write()
-    # for result in cron.run_scheduler(cadence=1, warp=True):
-    #     with cron.log as log:
-    #         lines = list(log.readlines())
-    #         if re.search(jobId, lines[0][-1]) is None:
-    #             print 'slurm job finished'
-    #             break
 
