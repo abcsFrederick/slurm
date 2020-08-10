@@ -80,17 +80,17 @@ class Slurm(Resource):
         title = 'slurm test'
         job = Job().createJob(title=title, type='split',
                               handler='slurm_handler', user=self.getCurrentUser())
-
-        job['meta']['slurm_info'] = {}
-        job['meta']['slurm_info']['name'] = Slurm().name
-        job['meta']['slurm_info']['entry'] = 'test.py'
+        job['otherFields'] = {}
+        job['otherFields']['slurm_info'] = {}
+        job['otherFields']['slurm_info']['name'] = Slurm().name
+        job['otherFields']['slurm_info']['entry'] = 'test.py'
 
         settings = Setting()
         SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
         shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
         shared_partition_output = os.path.join(SHARED_PARTITION, 'outputs')
         modulesPath = os.path.join(SHARED_PARTITION, 'modules')
-        pythonScriptPath = os.path.join(modulesPath, job['meta']['slurm_info']['entry'])
+        pythonScriptPath = os.path.join(modulesPath, job['otherFields']['slurm_info']['entry'])
 
         Job().updateJob(job, status=JobStatus.QUEUED)
 
@@ -130,7 +130,8 @@ class Slurm(Resource):
             slurmJobId = int(res.split()[-1])
 
             events.trigger('cron.watch', {'slurmJobId': slurmJobId})
-            job['meta']['slurm_info']['slurm_id'] = slurmJobId
+            job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
+            job = Job().save(job)
             Job().updateJob(job, status=JobStatus.RUNNING)
             
         except Exception:
@@ -165,6 +166,6 @@ class Slurm(Resource):
         for cronjob in crons:
             cron.remove(cronjob)
             cron.write()
-        job = Job().findOne({'meta.slurm_info.slurm_id': slurmJobId})
+        job = Job().findOne({'otherFields.slurm_info.slurm_id': slurmJobId})
         Job().updateJob(job, status=JobStatus.SUCCESS)
         return commentId + ' crontab remove and update ' + slurmJobId + ' slurm job id.'
