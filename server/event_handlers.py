@@ -74,6 +74,7 @@ def watch(event):
     logPath = os.path.join(CRONTAB_PARTITION, jobId)
     shellPath = os.path.join(CRONTAB_PARTITION, 'crontab.sh')
     randomId = str(random.getrandbits(128))
+    cron = CronTab(user=True)
     job = cron.new(command=shellPath + ' ' + jobId + ' ' + randomId + ' >> ' + logPath + ' 2>&1\n')
 
     job.set_comment(randomId)
