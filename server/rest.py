@@ -197,5 +197,6 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
         log_file_name = 'slurm-{}.{}.out'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
         log_file_path = os.path.join(self._shared_partition_log, log_file_name)
         f = open(log_file_path, "r")
+        print job['log']
         job['log'][0] = f.read()
         f.close()
