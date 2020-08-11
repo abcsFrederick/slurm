@@ -9,6 +9,7 @@ def main(output):
   for a in range(0,200):
     f = open(path, 'a')
     time.sleep(1)
+    print a
     f.write(str(a) + '\n')
     f.close()
   f = open(path, 'a')
