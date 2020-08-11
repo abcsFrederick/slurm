@@ -37,7 +37,6 @@ class Slurm(Resource):
         self._modulesPath = os.path.join(self.SHARED_PARTITION, 'modules')
         self._shellPath = os.path.join(self.SHARED_PARTITION, 'shells')
 
-        self.position = 0
         self.route('GET', (), self.getSlurm)
         self.route('PUT', ('cancel', ':id'), self.cancelSlurm)
         self.route('POST', (), self.submitSlurmJob)
@@ -127,7 +126,7 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
                                     shared_partition_output=self._shared_partition_output,
                                     pythonScriptPath=pythonScriptPath)
 
-        shellScriptPath = os.path.join(self._shellPath, 'test.sh')
+        shellScriptPath = os.path.join(self._shellPath, job['otherFields']['slurm_info']['name'] + '.sh')
         with open(shellScriptPath, "w") as sh:
             sh.write(script)
         try:
@@ -178,8 +177,13 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
         job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})
         Job().updateJob(job, status=JobStatus.SUCCESS)
 
+        log_file_name = 'slurm-{}.{}.out'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
+        log_file_path = os.path.join(self._shared_partition_log, log_file_name)
+        f = open(log_file_path, "r")
+        job['log'][0] = f.read()
+        f.close()
         # _send_to_girder
-        push_output(job, slurmJobId)
+        # push_output(job, slurmJobId)
         return commentId + ' crontab remove and update ' + str(job['_id']) + ' job status.'
 
     @access.public
@@ -192,9 +196,7 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
         Job().updateJob(job, status=JobStatus.RUNNING)
         # send log to girder periodic
         log_file_name = 'slurm-{}.{}.out'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
-        log_file_path = self._shared_partition_log + '/' + log_file_name
+        log_file_path = os.path.join(self._shared_partition_log, log_file_name)
         f = open(log_file_path, "r")
-        f.seek(self.position)
-        content = f.read()
-        job['log'].append(content)
-        self.position += len(content)
+        job['log'][0] = f.read()
+        f.close()
