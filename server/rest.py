@@ -43,7 +43,7 @@ class Slurm(Resource):
         self.route('POST', (), self.submitSlurmJob)
         self.route('GET', ('settings',), self.getSettings)
         self.route('POST', ('update',), self.update)
-        self.route('PUT', ('updateStep',), self.updateStep)
+        self.route('PUT', ('updatestep',), self.updateStep)
     # Find link record based on original item ID or parentId(to check chirdren links)
     # Return only record that have READ access(>=0) to user.
     # @access.user(scope=TokenScope.DATA_READ)
