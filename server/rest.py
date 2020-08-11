@@ -97,20 +97,26 @@ class Slurm(Resource):
         pythonScriptPath = os.path.join(self._modulesPath, job['otherFields']['slurm_info']['entry'])
 
         Job().updateJob(job, status=JobStatus.QUEUED)
-
+'''
+#!/bin/bash
+#SBATCH --job-name=test
+#SBATCH --output=/mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/logs/slurm-%x.%j.out
+mkdir -p /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/outputs/slurm-%x.%j
+python /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/modules/test.py --output /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/outputs/slurm-%x.%j
+'''
         batchscript = """#!/bin/bash
-            #SBATCH --partition={partition}
-            #SBATCH --job-name={name}
-            #SBATCH --nodes={nodes}
-            #SBATCH --ntasks={ntasks}
-            #SBATCH --gres={gres}
-            #SBATCH --mem-per-cpu={mem_per_cpu}
-            #SBATCH --output={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.out
-            #SBATCH --error={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.err
+#SBATCH --partition={partition}
+#SBATCH --job-name={name}
+#SBATCH --nodes={nodes}
+#SBATCH --ntasks={ntasks}
+#SBATCH --gres={gres}
+#SBATCH --mem-per-cpu={mem_per_cpu}
+#SBATCH --output={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.out
+#SBATCH --error={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.err
 
-            mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
-            python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
-        """
+mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
+python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
+"""
         script = batchscript.format(name=Slurm().name,
                                     partition=Slurm().partition,
                                     nodes=Slurm().nodes,
