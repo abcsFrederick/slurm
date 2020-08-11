@@ -111,8 +111,8 @@ class Slurm(Resource):
 #SBATCH --ntasks={ntasks}
 #SBATCH --gres={gres}
 #SBATCH --mem-per-cpu={mem_per_cpu}
-#SBATCH --output={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.out
-#SBATCH --error={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.err
+#SBATCH --output={shared_partition_log}/slurm-%x.%j.out
+#SBATCH --error={shared_partition_log}/slurm-%x.%j.err
 
 mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
