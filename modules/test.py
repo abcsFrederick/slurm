@@ -6,7 +6,7 @@ def main(output):
   path = os.path.join(output, 'out.log')
   if os.path.exists(path):
     os.remove(path)
-  for a in range(0,5):
+  for a in range(0,200):
     f = open(path, 'a')
     time.sleep(1)
     f.write(str(a) + '\n')
