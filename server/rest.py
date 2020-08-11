@@ -193,7 +193,6 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
     )
     def updateStep(self, slurmJobId):
         job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})
-        Job().updateJob(job, status=JobStatus.RUNNING)
         # send log to girder periodic
         log_file_name = 'slurm-{}.{}.out'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
         log_file_path = os.path.join(self._shared_partition_log, log_file_name)
