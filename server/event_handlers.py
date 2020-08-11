@@ -41,18 +41,18 @@ def schedule(event):
         Job().updateJob(job, status=JobStatus.QUEUED)
 
         batchscript = """#!/bin/bash
-            #SBATCH --partition={partition}
-            #SBATCH --job-name={name}
-            #SBATCH --nodes={nodes}
-            #SBATCH --ntasks={ntasks}
-            #SBATCH --gres={gres}
-            #SBATCH --mem-per-cpu={mem_per_cpu}
-            #SBATCH --output={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.out
-            #SBATCH --error={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.err
+#SBATCH --partition={partition}
+#SBATCH --job-name={name}
+#SBATCH --nodes={nodes}
+#SBATCH --ntasks={ntasks}
+#SBATCH --gres={gres}
+#SBATCH --mem-per-cpu={mem_per_cpu}
+#SBATCH --output={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.out
+#SBATCH --error={shared_partition_log}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID.err
 
-            mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
-            python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
-        """
+mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
+python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
+"""
         script = batchscript.format(name=slurm_info_new['name'],
                                     partition=slurm_info_new['partition'],
                                     nodes=slurm_info_new['nodes'],

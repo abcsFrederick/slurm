@@ -97,13 +97,13 @@ class Slurm(Resource):
         pythonScriptPath = os.path.join(self._modulesPath, job['otherFields']['slurm_info']['entry'])
 
         Job().updateJob(job, status=JobStatus.QUEUED)
-'''
-#!/bin/bash
-#SBATCH --job-name=test
-#SBATCH --output=/mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/logs/slurm-%x.%j.out
-mkdir -p /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/outputs/slurm-%x.%j
-python /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/modules/test.py --output /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/outputs/slurm-%x.%j
-'''
+        '''
+        #!/bin/bash
+        #SBATCH --job-name=test
+        #SBATCH --output=/mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/logs/slurm-%x.%j.out
+        mkdir -p /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/outputs/slurm-%x.%j
+        python /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/modules/test.py --output /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1/outputs/slurm-%x.%j
+        '''
         batchscript = """#!/bin/bash
 #SBATCH --partition={partition}
 #SBATCH --job-name={name}
