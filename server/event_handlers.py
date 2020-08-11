@@ -30,6 +30,7 @@ def schedule(event):
     slurm_info_new = job['otherFields']['slurm_info']
     # shellScript = job['shellScript']
     if job['handler'] == 'slurm_handler' and slurm_info_new['entry'] is not None:
+        fetch_input(job)
         settings = Setting()
         SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
         shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')

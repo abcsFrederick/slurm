@@ -1,7 +1,7 @@
 from bson import ObjectId
 import os
 import subprocess
-
+from subprocess import PIPE, Popen
 from girder import events
 from girder.models.setting import Setting
 from girder.api.rest import Resource
@@ -30,11 +30,20 @@ class Slurm(Resource):
         self.gres = 'gpu:p100:1'
         self.mem_per_cpu = '32gb'
 
+        settings = Setting()
+        self.SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
+        self._shared_partition_log = os.path.join(self.SHARED_PARTITION, 'logs')
+        self._shared_partition_output = os.path.join(self.SHARED_PARTITION, 'outputs')
+        self._modulesPath = os.path.join(self.SHARED_PARTITION, 'modules')
+        self._shellPath = os.path.join(self.SHARED_PARTITION, 'shells')
+
+        self.position = 0
         self.route('GET', (), self.getSlurm)
         self.route('PUT', ('cancel', ':id'), self.cancelSlurm)
         self.route('POST', (), self.submitSlurmJob)
         self.route('GET', ('settings',), self.getSettings)
         self.route('POST', ('update',), self.update)
+        self.route('PUT', ('updateStep',), self.updateStep)
     # Find link record based on original item ID or parentId(to check chirdren links)
     # Return only record that have READ access(>=0) to user.
     # @access.user(scope=TokenScope.DATA_READ)
@@ -85,12 +94,7 @@ class Slurm(Resource):
         job['otherFields']['slurm_info']['name'] = Slurm().name
         job['otherFields']['slurm_info']['entry'] = 'test.py'
 
-        settings = Setting()
-        SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
-        shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
-        shared_partition_output = os.path.join(SHARED_PARTITION, 'outputs')
-        modulesPath = os.path.join(SHARED_PARTITION, 'modules')
-        pythonScriptPath = os.path.join(modulesPath, job['otherFields']['slurm_info']['entry'])
+        pythonScriptPath = os.path.join(self._modulesPath, job['otherFields']['slurm_info']['entry'])
 
         Job().updateJob(job, status=JobStatus.QUEUED)
 
@@ -113,12 +117,11 @@ class Slurm(Resource):
                                     ntasks=Slurm().ntasks,
                                     gres=Slurm().gres,
                                     mem_per_cpu=Slurm().mem_per_cpu,
-                                    shared_partition_log=shared_partition_log,
-                                    shared_partition_output=shared_partition_output,
+                                    shared_partition_log=self._shared_partition_log,
+                                    shared_partition_output=self._shared_partition_output,
                                     pythonScriptPath=pythonScriptPath)
 
-        shellPath = os.path.join(SHARED_PARTITION, 'shells')
-        shellScriptPath = os.path.join(shellPath, 'test.sh')
+        shellScriptPath = os.path.join(self._shellPath, 'test.sh')
         with open(shellScriptPath, "w") as sh:
             sh.write(script)
         try:
@@ -168,4 +171,24 @@ class Slurm(Resource):
             cron.write()
         job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})
         Job().updateJob(job, status=JobStatus.SUCCESS)
+
+        # _send_to_girder
+        push_output(job, slurmJobId)
         return commentId + ' crontab remove and update ' + str(job['_id']) + ' job status.'
+
+    @access.public
+    @autoDescribeRoute(
+        Description('Update job info on girder when slurm job is finished.')
+        .param('slurmJobId', 'slurm job id.', required=True)
+    )
+    def updateStep(self, slurmJobId):
+        job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})
+        Job().updateJob(job, status=JobStatus.RUNNING)
+        # send log to girder periodic
+        log_file_name = 'slurm-{}.{}.out'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
+        log_file_path = self._shared_partition_log + '/' + log_file_name
+        f = open(log_file_path, "r")
+        f.seek(self.position)
+        content = f.read()
+        job['log'].append(content)
+        self.position += len(content)
