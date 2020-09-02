@@ -1,0 +1,15 @@
+.g-config-breadcrumb-container
+p.g-Slurm-settings-description
+  | Configure to set shared partition between girder server and FRCE.
+
+form#g-Slurm-settings-form(role="form")
+  .form-group
+    label.control-label(for="g-Slurm-settings-SHARED") Shared partition path
+    p.g-Slurm-settings-description
+    input#g-Slurm-settings-SHARED.input-sm.form-control(type="text", value=settings["slurm.SHARED_PARTITION"], title="SHARED PARTITION path in Slurm.", placeholder="Do not change only if you know what you are doing (default /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1)")
+
+    label.control-label(for="g-Slurm-settings-CRONTABD") TMP partition for crontab
+    //- p.g-Slurm-settings-description
+    input#g-Slurm-settings-CRONTAB.input-sm.form-control(type="text", value=settings["slurm.CRONTAB_PARTITION"], title="Crontab monitor partition.", placeholder="Do not change only if you know what you are doing (default /mnt/data/fr-s-ivg-infv-p/tmp/crontab)")
+  p#g-Slurm-settings-error-message.g-validation-failed-message
+  input.btn.btn-sm.btn-primary(type="submit", value="Save")
