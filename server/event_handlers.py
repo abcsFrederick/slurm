@@ -81,7 +81,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             if not res.startswith(b"Submitted batch"):
                 return None
             slurmJobId = int(res.split()[-1])
-
+            print slurmJobId
             events.trigger('cron.watch', {'slurmJobId': slurmJobId})
             job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
             job = Job().save(job)
