@@ -73,3 +73,10 @@ def fetch_input(spec):
     else:
         raise Exception('Invalid resource type: ' + resource_type)
     return dest
+
+def send_output(spec):
+    resource_type = spec.get('resource_type', 'file').lower()
+    spec.get()
+    client = _init_client(spec, require_token=True)
+    client.upload(data, spec['parent_id'], spec['parent_type'], reference=reference, leafFoldersAsItems=True)
+    return dest

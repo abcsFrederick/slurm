@@ -15,6 +15,7 @@ from girder.plugins.jobs.models.job import Job
 from girder.plugins.jobs.constants import JobStatus
 
 import girder_io.input as girderInput
+import girder_io.output as girderOutput
 from . import event_handlers
 from .constants import PluginSettings
 import datetime
@@ -275,7 +276,8 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
         f.close()
         job.save()
         # _send_to_girder
-        # push_output(job, slurmJobId)
+        # send /mnt/hpc/webdata/server/fr-s-ivg-ssr-*/tmp/slurm-job['otherFields']['slurm_info']['name'].slurmJobId
+        # girderOutput.girderOutputSpec(job, slurmJobId, token=self.token)
         return commentId + ' crontab remove and update ' + str(job['_id']) + ' job status.'
 
     @access.public

@@ -55,7 +55,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 
         execCommand = """python {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
         for name in job['kwargs']['inputs']:
-            arg = "--" + name + " " + str(inputs[name]['data']) + " "
+            arg = "--" + name + " " + str(job['kwargs']['inputs'][name]['data']) + " "
             execCommand += arg
         batchscript += execCommand
 
