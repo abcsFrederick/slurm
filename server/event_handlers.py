@@ -29,6 +29,8 @@ def schedule(event):
     job = event.info
     slurm_info_new = job['otherFields']['slurm_info']
     # shellScript = job['shellScript']
+    print(job['handler'])
+    print(slurm_info_new)
     if job['handler'] == 'slurm_handler' and slurm_info_new['entry'] is not None:
         # fetch_input(job)
         settings = Setting()
