@@ -62,6 +62,18 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def getSlurmOption(self):
+        if SlurmModel().findOne({'user': self.getCurrentUser()['_id']}) is None:
+            doc = {
+                'user': user['_id'],
+                'partition': 'norm',
+                'gres': "",
+                'nodes': 1,
+                'ntasks': 1,
+                'cpu_per_task': 1,
+                'mem_per_cpu': 16,
+                'time': 1
+            }
+            SlurmModel().save(doc)
         return SlurmModel().findOne({'user': self.getCurrentUser()['_id']})
 
     @access.public

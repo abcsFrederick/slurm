@@ -40,8 +40,8 @@ class Slurm(AccessControlledModel):
                 'nodes': 1,
                 'ntasks': 1,
                 'cpu_per_task': 1,
-                'mem_per_cpu': '16gb',
-                'time': '1:00:00'
+                'mem_per_cpu': 16,
+                'time': 1
             }
             self.save(doc)
     def validate(self, doc):
