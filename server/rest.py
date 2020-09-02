@@ -64,7 +64,7 @@ class Slurm(Resource):
     def getSlurmOption(self):
         if SlurmModel().findOne({'user': self.getCurrentUser()['_id']}) is None:
             doc = {
-                'user': user['_id'],
+                'user': self.getCurrentUser()['_id'],
                 'partition': 'norm',
                 'gres': "",
                 'nodes': 1,
