@@ -2,7 +2,7 @@ import time
 import os, sys
 import argparse
 
-def main(output):
+def main(directory):
   path = os.path.join(output, 'out.log')
   if os.path.exists(path):
     os.remove(path)
@@ -17,6 +17,6 @@ def main(output):
   f.close()
 if __name__ == '__main__':
   parser = argparse.ArgumentParser()
-  parser.add_argument('-o', '--output', help='output.', required=True)
+  parser.add_argument('-d', '--directory', help='tmp directory for current slurm job data input/ouput.', required=True)
   kwargs = vars(parser.parse_args())
   main(**kwargs)

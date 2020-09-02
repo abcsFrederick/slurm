@@ -1,8 +1,13 @@
+import girder_client
+from ..constants import PluginSettings
+import os
+
 def _init_client(spec, require_token=False):
     if 'api_url' in spec:
         client = girder_client.GirderClient(
-            apiUrl=spec['api_url'],
-            cacheSettings=_get_cache_settings(spec))
+            apiUrl=spec['api_url'])
+        # ,
+        #     cacheSettings=_get_cache_settings(spec))
     elif 'host' in spec:
         scheme = spec.get('scheme', 'http')
         port = spec.get('port', {
@@ -58,3 +63,13 @@ def send_to_girder(data, spec, **kwargs):
         raise Exception('Invalid Girder push target: ' + target)
 def handler(spec):
     client = _init_client(spec)
+
+def fetch_input(spec):
+    resource_type = spec.get('resource_type', 'file').lower()
+    client = _init_client(spec, require_token=True)
+    dest = os.path.join(spec['kwargs']['_tempdir'], spec['name'])
+    if resource_type == 'folder':
+        client.downloadFolderRecursive(spec['id'], dest)
+    else:
+        raise Exception('Invalid resource type: ' + resource_type)
+    return dest

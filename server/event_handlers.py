@@ -30,11 +30,11 @@ def schedule(event):
     slurm_info_new = job['otherFields']['slurm_info']
     # shellScript = job['shellScript']
     if job['handler'] == 'slurm_handler' and slurm_info_new['entry'] is not None:
-        fetch_input(job)
+        # fetch_input(job)
         settings = Setting()
         SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
         shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
-        shared_partition_output = os.path.join(SHARED_PARTITION, 'outputs')
+        shared_partition_work_directory = os.path.join(SHARED_PARTITION, 'tmp')
         modulesPath = os.path.join(SHARED_PARTITION, 'modules')
         pythonScriptPath = os.path.join(modulesPath, slurm_info_new['entry'])
 
@@ -50,9 +50,15 @@ def schedule(event):
 #SBATCH --output={shared_partition_log}/slurm-%x.%j.out
 #SBATCH --error={shared_partition_log}/slurm-%x.%j.err
 
-mkdir -p {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
-python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
+mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 """
+
+        execCommand = """python {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
+        for name in job['kwargs']['inputs']:
+            arg = "--" + name + " " + str(inputs[name]['data']) + " "
+            execCommand += arg
+        batchscript += execCommand
+
         script = batchscript.format(name=slurm_info_new['name'],
                                     partition=slurm_info_new['partition'],
                                     nodes=slurm_info_new['nodes'],
@@ -60,7 +66,7 @@ python {pythonScriptPath} --output {shared_partition_output}/slurm-$SLURM_JOB_NA
                                     gres=slurm_info_new['gres'],
                                     mem_per_cpu=slurm_info_new['mem_per_cpu'],
                                     shared_partition_log=shared_partition_log,
-                                    shared_partition_output=shared_partition_output,
+                                    shared_partition_work_directory=shared_partition_work_directory,
                                     pythonScriptPath=pythonScriptPath)
         shellPath = os.path.join(SHARED_PARTITION, 'shells')
         shellScriptPath = os.path.join(shellPath, slurm_info_new['name'] + '.sh')
