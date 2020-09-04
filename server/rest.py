@@ -144,6 +144,7 @@ class Slurm(Resource):
 
         job = Job().createJob(title=title, type='split',
                               handler='slurm_handler', user=self.getCurrentUser())
+
         folder = Folder().load('5eda8bd57441a06858e80c82', level=AccessType.READ, user=self.user)
 
         inputs = {
@@ -216,7 +217,6 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
                                     shared_partition_work_directory=self._shared_partition_work_directory,
                                     pythonScriptPath=pythonScriptPath)
 
-        print script
         shellScriptPath = os.path.join(self._shellPath, job['otherFields']['slurm_info']['name'] + '.sh')
         with open(shellScriptPath, "w") as sh:
             sh.write(script)

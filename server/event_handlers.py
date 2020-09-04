@@ -29,8 +29,6 @@ def schedule(event):
     job = event.info
     slurm_info_new = job['otherFields']['slurm_info']
     # shellScript = job['shellScript']
-    print(job['handler'])
-    print(slurm_info_new)
     if job['handler'] == 'slurm_handler' and slurm_info_new['entry'] is not None:
         # fetch_input(job)
         settings = Setting()
@@ -54,42 +52,44 @@ def schedule(event):
 
 mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 """
-
         execCommand = """python3.6 {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
         for name in job['kwargs']['inputs']:
-            arg = "--" + name + " " + str(job['kwargs']['inputs'][name]['data']) + " "
+            if isinstance(job['kwargs']['inputs'][name]['data'], list):
+                arg = "--" + name + " " + str([str(a) for a in job['kwargs']['inputs'][name]['data']]) + " "
+            else:
+                arg = "--" + name + " " + str(job['kwargs']['inputs'][name]['data']) + " "
             execCommand += arg
         batchscript += execCommand
-
-        script = batchscript.format(name=slurm_info_new['name'],
-                                    partition=slurm_info_new['partition'],
-                                    nodes=slurm_info_new['nodes'],
-                                    ntasks=slurm_info_new['ntasks'],
-                                    gres=slurm_info_new['gres'],
-                                    mem_per_cpu=slurm_info_new['mem_per_cpu'],
-                                    shared_partition_log=shared_partition_log,
-                                    shared_partition_work_directory=shared_partition_work_directory,
-                                    pythonScriptPath=pythonScriptPath)
-        shellPath = os.path.join(SHARED_PARTITION, 'shells')
-        shellScriptPath = os.path.join(shellPath, slurm_info_new['name'] + '.sh')
-        with open(shellScriptPath, "w") as sh:
-            sh.write(script)
-        try:
-            args = ['sbatch']
-            args.append(sh.name)
-            res = subprocess.check_output(args).strip()
-            if not res.startswith(b"Submitted batch"):
-                return None
-            slurmJobId = int(res.split()[-1])
-            events.trigger('cron.watch', {'slurmJobId': slurmJobId})
-            job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
-            job = Job().save(job)
-            Job().updateJob(job, status=JobStatus.RUNNING)
+        print(batchscript)
+        # script = batchscript.format(name=slurm_info_new['name'],
+        #                             partition=slurm_info_new['partition'],
+        #                             nodes=slurm_info_new['nodes'],
+        #                             ntasks=slurm_info_new['ntasks'],
+        #                             gres=slurm_info_new['gres'],
+        #                             mem_per_cpu=slurm_info_new['mem_per_cpu'],
+        #                             shared_partition_log=shared_partition_log,
+        #                             shared_partition_work_directory=shared_partition_work_directory,
+        #                             pythonScriptPath=pythonScriptPath)
+        # shellPath = os.path.join(SHARED_PARTITION, 'shells')
+        # shellScriptPath = os.path.join(shellPath, slurm_info_new['name'] + '.sh')
+        # with open(shellScriptPath, "w") as sh:
+        #     sh.write(script)
+        # try:
+        #     args = ['sbatch']
+        #     args.append(sh.name)
+        #     res = subprocess.check_output(args).strip()
+        #     if not res.startswith(b"Submitted batch"):
+        #         return None
+        #     slurmJobId = int(res.split()[-1])
+        #     events.trigger('cron.watch', {'slurmJobId': slurmJobId})
+        #     job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
+        #     job = Job().save(job)
+        #     Job().updateJob(job, status=JobStatus.RUNNING)
             
-        except Exception:
-            return 'something wrong during slurm start'
+        # except Exception:
+        #     return 'something wrong during slurm start'
         
-        return slurmJobId
+        # return slurmJobId
 
 def watch(event):
     import random
