@@ -55,7 +55,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
         execCommand = """python3.6 {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
         for name in job['kwargs']['inputs']:
             if isinstance(job['kwargs']['inputs'][name]['data'], list):
-                arg = "--" + name + " " + str([str(a) for a in job['kwargs']['inputs'][name]['data']]) + " "
+                arg = "--" + name + " " + ' '.join('"{0}"'.format(i) for i in inputs[name]['data']) + " "
             else:
                 arg = "--" + name + " " + str(job['kwargs']['inputs'][name]['data']) + " "
             execCommand += arg
