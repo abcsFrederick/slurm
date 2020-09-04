@@ -15,36 +15,7 @@ def getWorkerApiUrl():
     return apiUrl or getApiUrl()
 
 @utils.with_tmpdir
-def girderOutputSpec(job, slurmJobId, token=None):
-    if isinstance(token, dict):
-        token = token['_id']
-
-    job['outputs'] = {
-        'api_url': getWorkerApiUrl(),
-        'token': token,
-        
-    }
-    result = {
-        'mode': 'girder',
-        'api_url': getWorkerApiUrl(),
-        'token': token,
-        'id': str(resource['_id']),
-        'name': name or resource['name'],
-        'resource_type': resourceType,
-        'type': dataType,
-        'format': dataFormat,
-        'fetch_parent': fetchParent,
-        'kwargs': kwargs
-    }
-
-    if resourceType == 'file' and not fetchParent and Setting().get(PluginSettings.DIRECT_PATH):
-        # If we are adding a file and it exists on the local filesystem include
-        # that location.  This can permit the user of the specification to
-        # access the file directly instead of downloading the file.
-        try:
-            result['direct_path'] = File().getLocalFilePath(resource)
-        except FilePathException:
-            pass
-    folderPath = send_output(result)
-    result['data'] = folderPath
-    return result
+def girderOutputSpec(job, data):
+    job = send_output(job, data)
+    print 'send finished'
+    return job

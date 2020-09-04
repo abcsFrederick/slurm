@@ -199,7 +199,7 @@ class Slurm(Resource):
 
 mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 """
-        execCommand = """python {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
+        execCommand = """python3.6 {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
 
         for name in job['kwargs']['inputs']:
             arg = "--" + name + " " + str(inputs[name]['data']) + " "
@@ -276,8 +276,10 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
         f.close()
         job.save()
         # _send_to_girder
+        slurm_output_name = 'slurm-{}.{}'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
+        data = os.path.join(self._shared_partition_work_directory, slurm_output_name)
         # send /mnt/hpc/webdata/server/fr-s-ivg-ssr-*/tmp/slurm-job['otherFields']['slurm_info']['name'].slurmJobId
-        # girderOutput.girderOutputSpec(job, slurmJobId, token=self.token)
+        girderOutput.girderOutputSpec(job, data)
         return commentId + ' crontab remove and update ' + str(job['_id']) + ' job status.'
 
     @access.public

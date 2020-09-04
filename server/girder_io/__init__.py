@@ -67,16 +67,20 @@ def handler(spec):
 def fetch_input(spec):
     resource_type = spec.get('resource_type', 'file').lower()
     client = _init_client(spec, require_token=True)
-    dest = os.path.join(spec['kwargs']['_tempdir'], spec['name'])
+    # dest = os.path.join(spec['kwargs']['_tempdir'], spec['name'])
+    dest = spec['kwargs']['_tempdir']
     if resource_type == 'folder':
         client.downloadFolderRecursive(spec['id'], dest)
     else:
         raise Exception('Invalid resource type: ' + resource_type)
     return dest
 
-def send_output(spec):
-    resource_type = spec.get('resource_type', 'file').lower()
-    spec.get()
-    client = _init_client(spec, require_token=True)
-    client.upload(data, spec['parent_id'], spec['parent_type'], reference=reference, leafFoldersAsItems=True)
-    return dest
+def send_output(job, data):
+    resource_type = job.get('resource_type', 'file').lower()
+    for output in job['outputs']:
+        parent_id = job['outputs'][output]['parent_id']
+        parent_type = job['outputs'][output]['parent_type']
+        reference = job['outputs'][output]['reference']
+    client = _init_client(job['outputs'], require_token=True)
+    client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
+    return job
