@@ -67,8 +67,7 @@ def handler(spec):
 def fetch_input(spec):
     resource_type = spec.get('resource_type', 'file').lower()
     client = _init_client(spec, require_token=True)
-    # dest = os.path.join(spec['kwargs']['_tempdir'], spec['name'])
-    dest = spec['kwargs']['_tempdir']
+    dest = os.path.join(spec['kwargs']['_tempdir'], spec['name'])
     if resource_type == 'folder':
         client.downloadFolderRecursive(spec['id'], dest)
     else:

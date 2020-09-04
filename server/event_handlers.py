@@ -85,7 +85,6 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             events.trigger('cron.watch', {'slurmJobId': slurmJobId})
             job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
             job = Job().save(job)
-            print job
             Job().updateJob(job, status=JobStatus.RUNNING)
         except Exception:
             return 'something wrong during slurm start'
