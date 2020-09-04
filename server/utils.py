@@ -24,9 +24,9 @@ def tmpdir(cleanup=True):
         yield path
     finally:
         # Cleanup the temp dir
-        # if cleanup and os.path.isdir(path):
-        #     shutil.rmtree(path)
-        pass
+        if cleanup and os.path.isdir(path):
+            shutil.rmtree(path)
+        # pass
 
 def with_tmpdir(fn):
     """
