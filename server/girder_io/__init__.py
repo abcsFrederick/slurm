@@ -76,10 +76,11 @@ def fetch_input(spec):
 
 def send_output(job, data):
     resource_type = job.get('resource_type', 'file').lower()
-    for output in job['kwargs']['outputs']:
-        parent_id = job['kwargs']['outputs'][output]['parent_id']
-        parent_type = job['kwargs']['outputs'][output]['parent_type']
-        reference = job['kwargs']['outputs'][output]['reference']
-    client = _init_client(job['kwargs']['outputs'], require_token=True)
+    outputs = json.loads(job['kwargs'])['outputs']
+    for output in outputs:
+        parent_id = outputs[output]['parent_id']
+        parent_type = outputs[output]['parent_type']
+        reference = outputs[output]['reference']
+    client = _init_client(outputs, require_token=True)
     client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
     return job
