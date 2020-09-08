@@ -1,6 +1,8 @@
 import girder_client
 from ..constants import PluginSettings
 import os
+import json
+
 
 def _init_client(spec, require_token=False):
     if 'api_url' in spec:
