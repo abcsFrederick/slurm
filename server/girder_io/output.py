@@ -14,7 +14,6 @@ def getWorkerApiUrl():
     apiUrl = Setting().get(PluginSettings.API_URL)
     return apiUrl or getApiUrl()
 
-@utils.with_tmpdir
 def girderOutputSpec(job, data):
     job = send_output(job, data)
     print 'send finished'
