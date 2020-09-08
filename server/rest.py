@@ -274,7 +274,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
         content = f.read()
         job['log'].append(content)
         f.close()
-        # Job().save(job)
+        Job().save(job)
         # _send_to_girder
         slurm_output_name = 'slurm-{}.{}'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
         data = os.path.join(self._shared_partition_work_directory, slurm_output_name)
