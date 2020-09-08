@@ -83,6 +83,6 @@ def send_output(job, data):
         parent_id = outputs[output]['parent_id']
         parent_type = outputs[output]['parent_type']
         reference = outputs[output]['reference']
-    client = _init_client(outputs[0], require_token=True)
+        client = _init_client(outputs[output], require_token=True)
     client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
     return job
