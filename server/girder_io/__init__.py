@@ -91,7 +91,7 @@ def send_output(job, data):
     print('------------------')
     print(girderInputSpec)
     for input in girderInputSpec:
-        print(_tempdir)
         _tempdir = girderInputSpec[input]['kwargs']['_tempdir']
+        print(_tempdir)
         shutil.rmtree(_tempdir)
     return job
