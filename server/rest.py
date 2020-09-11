@@ -111,11 +111,8 @@ class Slurm(Resource):
     )
     def getSlurm(self):
         hostname = 'miaot2'
-        res = Popen(['squeue', '-u', hostname], stdout=PIPE, stderr=PIPE)
-        for line in res.stdout:
-            line = line.rstrip()
-            print(line)
-        return res.stdout
+        out = subprocess.check_output(['squeue', '-u', hostname])
+        return out
 
     @access.public
     @autoDescribeRoute(
