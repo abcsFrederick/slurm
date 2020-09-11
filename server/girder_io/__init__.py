@@ -2,6 +2,7 @@ import girder_client
 from ..constants import PluginSettings
 import os
 import json
+import shutil
 
 
 def _init_client(spec, require_token=False):
@@ -85,4 +86,9 @@ def send_output(job, data):
         reference = outputs[output]['reference']
         client = _init_client(outputs[output], require_token=True)
     client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
+    inputs = json.loads(job['kwargs'])['inputs']
+    girderInputSpec = {k: v for k, v in inputs.items() if v['mode'] == 'girder'}
+    for input in girderInputSpec:
+        _tempdir = girderInputSpec[input]['kwargs']['_tempdir']
+        shutil.rmtree(_tempdir)
     return job

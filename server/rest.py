@@ -110,8 +110,8 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def getSlurm(self):
-        hostname = ''
-        res = Popen(['squeue'], stdout=PIPE, stderr=PIPE)
+        hostname = 'miaot2'
+        res = Popen(['squeue', '-u', hostname], stdout=PIPE, stderr=PIPE)
         for line in res.stdout:
             line = line.rstrip()
             print(line)
