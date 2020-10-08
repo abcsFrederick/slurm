@@ -88,10 +88,7 @@ def send_output(job, data):
     client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
     inputs = json.loads(job['kwargs'])['inputs']
     girderInputSpec = {k: v for k, v in inputs.items() if v['mode'] == 'girder'}
-    print('------------------')
-    print(girderInputSpec)
     for input in girderInputSpec:
         _tempdir = girderInputSpec[input]['kwargs']['_tempdir']
-        print(_tempdir)
         shutil.rmtree(_tempdir)
     return job

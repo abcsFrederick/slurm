@@ -225,7 +225,10 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
                 return None
             slurmJobId = int(res.split()[-1])
 
-            events.trigger('cron.watch', {'slurmJobId': slurmJobId})
+            # events.trigger('cron.watch', {'slurmJobId': slurmJobId})
+            # thread method
+            threading.Thread(target=event_handlers.loopWatch, args=(slurmJobId)).start()
+
             job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
             job = Job().save(job)
             Job().updateJob(job, status=JobStatus.RUNNING)

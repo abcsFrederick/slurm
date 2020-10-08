@@ -1,3 +1,4 @@
+import threading
 import subprocess
 import datetime
 import sys, os
@@ -82,7 +83,10 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             if not res.startswith(b"Submitted batch"):
                 return None
             slurmJobId = int(res.split()[-1])
-            events.trigger('cron.watch', {'slurmJobId': slurmJobId})
+            # crontab method
+            # events.trigger('cron.watch', {'slurmJobId': slurmJobId})
+            # thread method
+            threading.Thread(target=loopWatch, args=(slurmJobId)).start()
             job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
             Job().save(job)
             Job().updateJob(job, status=JobStatus.RUNNING)
@@ -107,3 +111,14 @@ def watch(event):
     job.enable()
     cron.write()
 
+def loopWatch(slurmJobId):
+    while True:
+        args = 'squeue -j {}'.format(slurmJobId)
+        output = subprocess.Popen(args,
+                                  stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+        out_put = output.communicate()[0]
+        found = re.findall(slurmJobId, out_put)
+        if len(found) == 0:
+            print 'job {} finished'.format(slurmJobId)
+            break
+        sleep(1)
