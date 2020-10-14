@@ -24,5 +24,5 @@ SettingDefault.defaults.update({
 def load(info):
     info['apiRoot'].slurm = rest.Slurm()
     SlurmModel()
-    events.bind('jobs.schedule', 'slurm', event_handlers.schedule)
-    events.bind('cron.watch', 'slurm', event_handlers.watch)
+    events.bind('slurm.schedule', 'slurm', event_handlers.schedule)
+    events.bind('cron.watch', 'slurm', event_handlers.cronWatch)

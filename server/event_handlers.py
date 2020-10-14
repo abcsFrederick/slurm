@@ -4,11 +4,13 @@ import datetime
 import sys, os
 import re
 from crontab import CronTab
+from time import sleep
 
 from girder import events
 from girder.models.setting import Setting
 from girder.plugins.jobs.constants import JobStatus
 from girder.plugins.jobs.models.job import Job
+import girder_io.output as girderOutput
 
 from .constants import PluginSettings
 
@@ -59,10 +61,9 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             if isinstance(job['kwargs']['inputs'][name]['data'], list):
                 arg = "--" + name + " " + ' '.join('"{0}"'.format(i) for i in job['kwargs']['inputs'][name]['data']) + " "
             else:
-                arg = "--" + name + " " + str(job['kwargs']['inputs'][name]['data']) + " "
+                arg = "--" + name + " '" + str(job['kwargs']['inputs'][name]['data']) + " "
             execCommand += arg
         batchscript += execCommand
-        # print(batchscript)
         script = batchscript.format(name=slurm_info_new['name'],
                                     partition=slurm_info_new['partition'],
                                     nodes=slurm_info_new['nodes'],
@@ -86,7 +87,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             # crontab method
             # events.trigger('cron.watch', {'slurmJobId': slurmJobId})
             # thread method
-            threading.Thread(target=loopWatch, args=(slurmJobId)).start()
+            threading.Thread(target=loopWatch, args=([str(slurmJobId)])).start()
             job['otherFields']['slurm_info']['slurm_id'] = slurmJobId
             Job().save(job)
             Job().updateJob(job, status=JobStatus.RUNNING)
@@ -95,7 +96,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
         
         return slurmJobId
 
-def watch(event):
+def cronWatch(event):
     import random
     slurmJobId = str(event.info['slurmJobId'])
     settings = Setting()
@@ -112,6 +113,10 @@ def watch(event):
     cron.write()
 
 def loopWatch(slurmJobId):
+    settings = Setting()
+    SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
+    shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
+    shared_partition_work_directory = os.path.join(SHARED_PARTITION, 'tmp')
     while True:
         args = 'squeue -j {}'.format(slurmJobId)
         output = subprocess.Popen(args,
@@ -119,6 +124,25 @@ def loopWatch(slurmJobId):
         out_put = output.communicate()[0]
         found = re.findall(slurmJobId, out_put)
         if len(found) == 0:
-            print 'job {} finished'.format(slurmJobId)
+            job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})
+            Job().updateJob(job, status=JobStatus.SUCCESS)
+            log_file_name = 'slurm-{}.{}.out'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
+            log_file_path = os.path.join(shared_partition_log, log_file_name)
+            f = open(log_file_path, "r")
+            content = f.read()
+            Job().updateJob(job, log=content)
+            f.close()
+            err_file_name = 'slurm-{}.{}.err'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
+            err_file_path = os.path.join(shared_partition_log, err_file_name)
+            f = open(err_file_path, "r")
+            content = f.read()
+            Job().updateJob(job, log=content)
+            f.close()
+            # Job().save(job)
+            # _send_to_girder
+            slurm_output_name = 'slurm-{}.{}'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
+            data = os.path.join(shared_partition_work_directory, slurm_output_name)
+            girderOutput.girderOutputSpec(job, data)
             break
+        print('update step')
         sleep(1)
