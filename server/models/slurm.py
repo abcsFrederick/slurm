@@ -44,6 +44,18 @@ class Slurm(AccessControlledModel):
                 'time': 1
             }
             self.save(doc)
+
+    def scheduleSlurm(self, job):
+        """
+        Trigger the event to schedule this job. Other plugins are in charge of
+        actually scheduling and/or executing the job, except in the case when
+        the handler is 'local'.
+        """
+        if job.get('async') is True:
+            events.daemon.trigger('slurm.schedule', info=job)
+        else:
+            events.trigger('slurm.schedule', info=job)
+
     def validate(self, doc):
         validation = (
             ('partition', 'Partition'),
