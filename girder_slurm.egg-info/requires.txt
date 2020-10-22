@@ -1,4 +1,0 @@
-girder>=3
-girder-jobs
-python-crontab
-Croniter

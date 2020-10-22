@@ -1,3 +1,0 @@
-[girder.plugin]
-slurm = girder_slurm:SlurmPlugin
-
