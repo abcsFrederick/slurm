@@ -1,15 +1,15 @@
-import View from 'girder/views/View';
+import View from '@girder/core/views/View';
 
 import PluginConfigBreadcrumbWidget from
-    'girder/views/widgets/PluginConfigBreadcrumbWidget';
-import { restRequest } from 'girder/rest';
-import events from 'girder/events';
+    '@girder/core/views/widgets/PluginConfigBreadcrumbWidget';
+import { restRequest } from '@girder/core/rest';
+import events from '@girder/core/events';
 
 import ConfigViewTemplate from '../../templates/configuration/configView.pug';
 import '../../stylesheets/configuration/configView.styl';
 
-import 'bootstrap-switch'; // /dist/js/bootstrap-switch.js',
-import 'bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css';
+// import 'bootstrap-switch'; // /dist/js/bootstrap-switch.js',
+// import 'bootstrap-switch/dist/css/bootstrap3/bootstrap-switch.css';
 
 var ConfigView = View.extend({
     events: {

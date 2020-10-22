@@ -8,9 +8,9 @@ from time import sleep
 
 from girder import events
 from girder.models.setting import Setting
-from girder.plugins.jobs.constants import JobStatus
-from girder.plugins.jobs.models.job import Job
-import girder_io.output as girderOutput
+from girder_jobs.constants import JobStatus
+from girder_jobs.models.job import Job
+import girder_slurm.girder_io.output as girderOutput
 
 from .constants import PluginSettings
 

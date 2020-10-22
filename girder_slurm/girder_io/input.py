@@ -1,7 +1,7 @@
 from girder.models.setting import Setting
 from ..constants import PluginSettings
 from .. import utils
-from girder.plugins.slurm.girder_io import fetch_input
+from girder_slurm.girder_io import fetch_input
 
 
 def getWorkerApiUrl():

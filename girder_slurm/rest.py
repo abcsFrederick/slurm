@@ -11,11 +11,11 @@ from girder.api.describe import Description, autoDescribeRoute
 from girder.api import access
 from girder.constants import AccessType, TokenScope
 
-from girder.plugins.jobs.models.job import Job
-from girder.plugins.jobs.constants import JobStatus
+from girder_jobs.models.job import Job
+from girder_jobs.constants import JobStatus
 
-import girder_io.input as girderInput
-import girder_io.output as girderOutput
+import girder_slurm.girder_io.input as girderInput
+import girder_slurm.girder_io.output as girderOutput
 from . import event_handlers
 from .constants import PluginSettings
 import datetime

@@ -1,7 +1,7 @@
-import View from 'girder/views/View';
+import View from '@girder/core/views/View';
 import slurmSelectionTemplate from '../../templates/widgets/slurmSelection.pug';
-import { restRequest } from 'girder/rest';
-import events from 'girder/events';
+import { restRequest } from '@girder/core/rest';
+import events from '@girder/core/events';
 
 import '../../stylesheets/widgets/slurmSelection.styl';
 

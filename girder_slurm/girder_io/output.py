@@ -1,7 +1,7 @@
 from girder.models.setting import Setting
 from ..constants import PluginSettings
 from .. import utils
-from girder.plugins.slurm.girder_io import send_output
+from girder_slurm.girder_io import send_output
 
 
 def getWorkerApiUrl():
@@ -16,5 +16,5 @@ def getWorkerApiUrl():
 
 def girderOutputSpec(job, data):
     job = send_output(job, data)
-    print 'send finished'
+    print ('send finished')
     return job
