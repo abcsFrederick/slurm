@@ -54,6 +54,7 @@ def schedule(event):
 #SBATCH --output={shared_partition_log}/slurm-%x.%j.out
 #SBATCH --error={shared_partition_log}/slurm-%x.%j.err
 
+module load {modules}
 mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 """
         execCommand = """python3.6 {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
@@ -70,6 +71,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
                                     ntasks=slurm_info_new['ntasks'],
                                     gres=slurm_info_new['gres'],
                                     mem_per_cpu=slurm_info_new['mem_per_cpu'],
+                                    modules=slurm_info_new['modules']
                                     shared_partition_log=shared_partition_log,
                                     shared_partition_work_directory=shared_partition_work_directory,
                                     pythonScriptPath=pythonScriptPath)
