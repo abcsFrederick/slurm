@@ -50,7 +50,7 @@ class Slurm(AccessControlledModel):
 
         return slurm_jobs
     def createJob(self, title, type, taskName, taskEntry, modules="", args=(), kwargs=None, user=None, when=None,
-                  interval=0, public=False, handler=None, async=False,
+                  interval=0, public=False, handler=None, asynchronous=False,
                   save=True, parentJob=None, otherFields=None):
         now = datetime.datetime.utcnow()
 
@@ -95,7 +95,7 @@ class Slurm(AccessControlledModel):
             'log': [],
             'meta': {},
             'handler': handler,
-            'async': async,
+            'asynchronous': asynchronous,
             'timestamps': [],
             'parentId': parentId
         }

@@ -6,10 +6,10 @@ from girder import events
 from girder.models.setting import Setting
 from girder.models.folder import Folder
 
-from girder.api.rest import Resource
+from girder.api.rest import Resource, filtermodel
 from girder.api.describe import Description, autoDescribeRoute
 from girder.api import access
-from girder.constants import AccessType, TokenScope
+from girder.constants import AccessType, TokenScope, SortDir
 
 from girder_jobs.models.job import Job
 from girder_jobs.constants import JobStatus
