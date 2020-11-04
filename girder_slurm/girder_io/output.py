@@ -18,3 +18,20 @@ def sendOutputToGirder(job, data):
     job = send_output(job, data)
     print ('send finished')
     return job
+
+def girderOutputSpec(parent, token, parentType='folder', name=None,
+                     dataType='string', dataFormat='text', reference=None):
+    if isinstance(token, dict):
+        token = token['_id']
+
+    return {
+        'mode': 'girder',
+        'api_url': getWorkerApiUrl(),
+        'token': token,
+        'name': name,
+        'parent_id': str(parent['_id']),
+        'parent_type': parentType,
+        'type': dataType,
+        'format': dataFormat,
+        'reference': reference
+    }
