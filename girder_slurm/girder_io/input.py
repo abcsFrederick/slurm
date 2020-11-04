@@ -57,14 +57,14 @@ def girderInputSpec(resource, resourceType='file', name=None, token=None,
         'kwargs': kwargs
     }
 
-    if resourceType == 'file' and not fetchParent: # and Setting().get(PluginSettings.DIRECT_PATH):
-        # If we are adding a file and it exists on the local filesystem include
-        # that location.  This can permit the user of the specification to
-        # access the file directly instead of downloading the file.
-        try:
-            result['direct_path'] = File().getLocalFilePath(resource)
-        except FilePathException:
-            pass
+    # if resourceType == 'file' and not fetchParent: # and Setting().get(PluginSettings.DIRECT_PATH):
+    #     # If we are adding a file and it exists on the local filesystem include
+    #     # that location.  This can permit the user of the specification to
+    #     # access the file directly instead of downloading the file.
+    #     try:
+    #         result['direct_path'] = File().getLocalFilePath(resource)
+    #     except FilePathException:
+    #         pass
     path = fetch_input(result)
     result['data'] = path
     return result

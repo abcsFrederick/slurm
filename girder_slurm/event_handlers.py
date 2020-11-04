@@ -62,7 +62,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             if isinstance(job['kwargs']['inputs'][name]['data'], list):
                 arg = "--" + name + " " + ' '.join('"{0}"'.format(i) for i in job['kwargs']['inputs'][name]['data']) + " "
             else:
-                arg = "--" + name + " '" + str(job['kwargs']['inputs'][name]['data']) + " "
+                arg = "--" + name + " '" + str(job['kwargs']['inputs'][name]['data']) + "' "
             execCommand += arg
         batchscript += execCommand
         script = batchscript.format(name=slurm_info_new['name'],
@@ -71,7 +71,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
                                     ntasks=slurm_info_new['ntasks'],
                                     gres=slurm_info_new['gres'],
                                     mem_per_cpu=slurm_info_new['mem_per_cpu'],
-                                    modules=slurm_info_new['modules'],
+                                    modules=" ".join(slurm_info_new['modules']),
                                     shared_partition_log=shared_partition_log,
                                     shared_partition_work_directory=shared_partition_work_directory,
                                     pythonScriptPath=pythonScriptPath)

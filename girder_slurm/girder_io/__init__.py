@@ -74,7 +74,7 @@ def fetch_input(spec):
     if resource_type == 'folder':
         client.downloadFolderRecursive(spec['id'], dest)
     elif resource_type == 'file':
-        dest = spec['direct_path']
+        client.downloadFolderRecursive(spec['id'], dest)
     else:
         raise Exception('Invalid resource type: ' + resource_type)
     return dest
