@@ -124,7 +124,6 @@ def loopWatch(slurmJobId):
         output = subprocess.Popen(args,
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out_put = output.communicate()[0]
-        print(slurmJobId, out_put)
         found = re.findall(slurmJobId, out_put.decode())
         if len(found) == 0:
             job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})

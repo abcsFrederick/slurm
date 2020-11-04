@@ -87,6 +87,8 @@ def send_output(job, data):
         parent_type = outputs[output]['parent_type']
         reference = outputs[output]['reference']
         client = _init_client(outputs[output], require_token=True)
+    print(parent_id)
+    print(data)
     client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
     inputs = json.loads(job['kwargs'])['inputs']
     girderInputSpec = {k: v for k, v in inputs.items() if v['mode'] == 'girder'}
