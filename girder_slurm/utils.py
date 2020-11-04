@@ -46,6 +46,10 @@ def with_tmpdir(fn):
             return fn(*args, **kwargs)
     return wrapped
 
+def getWorkerApiUrl():
+    apiUrl = Setting().get(PluginSettings.API_URL)
+    return apiUrl or getApiUrl()
+
 def jobInfoSpec(job, token=None, logPrint=True):
     """
     Build the jobInfo specification for a task to write status and log output
