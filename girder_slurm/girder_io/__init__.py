@@ -73,7 +73,7 @@ def fetch_input(spec):
     dest = os.path.join(spec['kwargs']['_tempdir'], spec['name'])
     if resource_type == 'folder':
         client.downloadFolderRecursive(spec['id'], dest)
-    else if resource_type == 'file':
+    elif resource_type == 'file':
         dest = spec['direct_path']
     else:
         raise Exception('Invalid resource type: ' + resource_type)
