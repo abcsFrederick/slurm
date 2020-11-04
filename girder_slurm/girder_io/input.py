@@ -3,6 +3,7 @@ from ..constants import PluginSettings
 from .. import utils
 from girder_slurm.girder_io import fetch_input
 from girder.exceptions import FilePathException
+from girder.models.file import File
 
 
 def getWorkerApiUrl():
