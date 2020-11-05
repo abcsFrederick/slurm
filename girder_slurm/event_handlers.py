@@ -82,6 +82,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
         try:
             args = ['sbatch']
             args.append(sh.name)
+            print(args)
             res = subprocess.check_output(args).strip()
             if not res.startswith(b"Submitted batch"):
                 return None

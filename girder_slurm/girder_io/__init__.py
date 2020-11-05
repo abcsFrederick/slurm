@@ -87,8 +87,6 @@ def send_output(job, data):
         parent_type = outputs[output]['parent_type']
         reference = outputs[output]['reference']
         client = _init_client(outputs[output], require_token=True)
-    print(parent_id)
-    print(data)
     if parent_type == 'folder':
         client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
     elif parent_type == 'item':
