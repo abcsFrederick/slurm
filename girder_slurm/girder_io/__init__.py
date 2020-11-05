@@ -93,7 +93,7 @@ def send_output(job, data):
         for root, dirs, files in os.walk(data):
             for file in files:
                 path = os.path.join(root, file)
-                client.upload(path, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
+                client.uploadFileToItem(parent_id, path, reference=reference)
 
     inputs = json.loads(job['kwargs'])['inputs']
     girderInputSpec = {k: v for k, v in inputs.items() if v['mode'] == 'girder'}
