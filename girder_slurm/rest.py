@@ -128,7 +128,7 @@ class Slurm(Resource):
         doc['ntasks'] = ntasks
         doc['cpu_per_task'] = cpu_per_task
         doc['mem_per_cpu'] = mem_per_cpu
-        doc['time'] = mem_per_cpu
+        doc['time'] = time
         return SlurmModel().save(doc)
     # Find link record based on original item ID or parentId(to check chirdren links)
     # Return only record that have READ access(>=0) to user.
