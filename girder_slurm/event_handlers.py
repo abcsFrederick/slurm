@@ -147,5 +147,4 @@ def loopWatch(slurmJobId):
             data = os.path.join(shared_partition_work_directory, slurm_output_name)
             girderOutput.sendOutputToGirder(job, data)
             break
-        print('update step')
         sleep(1)
