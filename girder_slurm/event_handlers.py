@@ -54,6 +54,7 @@ def schedule(event):
 #SBATCH --output={shared_partition_log}/slurm-%x.%j.out
 #SBATCH --error={shared_partition_log}/slurm-%x.%j.err
 
+source /etc/profile.d/modules.sh
 module load {modules}
 mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 """
