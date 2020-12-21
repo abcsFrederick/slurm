@@ -18,8 +18,8 @@ def validateString(doc):
     pass
 
 SettingDefault.defaults.update({
-    PluginSettings.SHARED_PARTITION: '/mnt/hpc/webdata/server/fr-s-ivg-ssr-d1', # hostname
-    PluginSettings.CRONTAB_PARTITION: '/mnt/data/fr-s-ivg-infv-p/tmp/crontab', # hostname
+    PluginSettings.SHARED_PARTITION: '/Your_mount_partition', # hostname
+    PluginSettings.CRONTAB_PARTITION: '/Your_crontab_partition_on_girder_server', # hostname
     PluginSettings.API_URL: 'http://localhost:8888/api/v1'
 })
 
@@ -30,4 +30,4 @@ class SlurmPlugin(plugin.GirderPlugin):
         info['apiRoot'].slurm = rest.Slurm()
         SlurmModel()
         events.bind('slurm.schedule', 'slurm', event_handlers.schedule)
-        events.bind('cron.watch', 'slurm', event_handlers.cronWatch)
+        # events.bind('cron.watch', 'slurm', event_handlers.cronWatch)
