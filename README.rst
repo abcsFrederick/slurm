@@ -17,11 +17,11 @@ Girder plugin for FRCE slurm connection.
 This plugin wrap sbatch command and shows the idea of submit slurm job to remote cluster and watch slurm status for getting result.
 Two method to keep monitor submit job status: 
 
-  **Crontab:**
-    As system based crontab will be started to monitor slurm task in minute. The limitation is it will not get immediate status for short-term task because crontab monitor per second.
+**Crontab:**
+  As system based crontab will be started to monitor slurm task in minute. The limitation is it will not get immediate status for short-term task because crontab monitor per second.
 
-  **Repeated monitor(Currently Used):**
-    It will start a thread for monitor each task in sec.
+**Repeated monitor(Currently Used):**
+  It will start a thread for monitor each task in sec.
 
 
 1. Prepare:
@@ -31,13 +31,13 @@ Two method to keep monitor submit job status:
 
 2. You also need four subfolders:
 
-  **/mounted/tmp** for temp input data fetched from girder and output data after slurm task finish
+**/mounted/tmp** for temp input data fetched from girder and output data after slurm task finish
 
-  **/mounted/modules** for python entry point script, put your python script for running under modules folder and run link_module.sh to copy paste your entry script to /mounted/modules.
+**/mounted/modules** for python entry point script, put your python script for running under modules folder and run link_module.sh to copy paste your entry script to /mounted/modules.
 
-  **/mounted/logs** for slurm .info and .err log file
+**/mounted/logs** for slurm .info and .err log file
 
-  **/mounted/shells** slurm start up batch script
+**/mounted/shells** slurm start up batch script
 
 3. You need to have slurm client installed on you girder server
 
@@ -51,9 +51,12 @@ Direct to slurm folder
 
 3. How to use
 -----------
-Go to plugin configuration, type and save required information 
+Go to plugin configuration, type and save required information
+
 SHARED_PARTITION: Your_mount_partition
+
 CRONTAB_PARTITION: Your_crontab_partition_on_girder_server (For using crontab method)
+
 API_URL: API
 
 Following explain how to use slurm model in your code:
