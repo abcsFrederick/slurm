@@ -31,13 +31,13 @@ Two method to keep monitor submit job status:
 
 2. You also need four subfolders:
 
-      **/mounted/tmp** for temp input data fetched from girder and output data after slurm task finish
+  **/mounted/tmp** for temp input data fetched from girder and output data after slurm task finish
 
-      **/mounted/modules** for python entry point script, put your python script for running under modules folder and run link_module.sh to copy paste your entry script to /mounted/modules.
+  **/mounted/modules** for python entry point script, put your python script for running under modules folder and run link_module.sh to copy paste your entry script to /mounted/modules.
 
-      **/mounted/logs** for slurm .info and .err log file
+  **/mounted/logs** for slurm .info and .err log file
 
-      **/mounted/shells** slurm start up batch script
+  **/mounted/shells** slurm start up batch script
 
 3. You need to have slurm client installed on you girder server
 
@@ -47,7 +47,7 @@ Install as normal girder plugin:
 
 Direct to slurm folder
 
-`` pip install -e . ``
+``pip install -e .``
 
 3. How to use
 -----------
@@ -58,7 +58,8 @@ API_URL: API
 
 Following explain how to use slurm model in your code:
 
-.. code-block:: javascript
+.. code-block:: python
+
   # Import slurm model and util
   from girder_slurm.models.slurm import Slurm as slurmModel
   from girder_slurm import utils as slurmUtils
