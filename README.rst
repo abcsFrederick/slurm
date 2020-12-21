@@ -2,6 +2,7 @@
 Slurm |build-status| |codecov-io|
 ====================================
 
+
 .. |build-status| image:: https://travis-ci.org/abcsFrederick/slurm.svg?branch=master
     :target: https://travis-ci.org/abcsFrederick/slurm?branch=master
     :alt: Build Status
@@ -15,35 +16,48 @@ Girder plugin for FRCE slurm connection.
 
 This plugin wrap sbatch command and shows the idea of submit slurm job to remote cluster and watch slurm status for getting result.
 Two method to keep monitor submit job status: 
-1. Crontab:
-  As system based crontab will be started to monitor slurm task in minute. The limitation is it will not get immediate status for short-term task because crontab monitor per second.
-2. Repeated monitor(Currently Used):
-  It will start a thread for monitor each task in sec.
+<ol>
+ <li>
+  Crontab:
+    As system based crontab will be started to monitor slurm task in minute. The limitation is it will not get immediate status for short-term task because crontab monitor per second.
+  </li>
+  <li>
+   Repeated monitor(Currently Used):
+     It will start a thread for monitor each task in sec.
+  </li>
+</ol>
 
-1. Prepare:
-You need to have your a shared partition mounted (e.g. /mounted) on you girder environment and your remote slurm cluster.
+#### 1. Prepare:
 
-You also need four subfolders:
-/mounted/tmp for temp input data fetched from girder and output data after slurm task finish
-/mounted/modules for python entry point script
-/mounted/logs for slurm .info and .err log file
-/mounted/shells: slurm start up batch script
+1. You need to have your a shared partition mounted (e.g. /mounted) on you girder environment and your remote slurm cluster.
 
-You need to have slurm client installed on you girder server
+2. You also need four subfolders:
 
-2. Install 
+      <b>/mounted/tmp</b> for temp input data fetched from girder and output data after slurm task finish
+
+      <b>/mounted/modules</b> for python entry point script
+
+      <b>/mounted/logs</b> for slurm .info and .err log file
+
+      <b>/mounted/shells</b> slurm start up batch script
+
+3. You need to have slurm client installed on you girder server
+
+#### 2. Install 
 Install as normal girder plugin:
-Direct to slurm folder
-pip install -e . 
 
-3. How to use
+Direct to slurm folder
+
+<code> pip install -e . </code>
+
+#### 3. How to use
 Go to plugin configuration, type and save required information 
 SHARED_PARTITION: Your_mount_partition
 CRONTAB_PARTITION: Your_crontab_partition_on_girder_server (For using crontab method)
 API_URL: API
 
 Following explain how to use slurm model in your code:
-
+```console
 # Import slurm model and util
 from girder_slurm.models.slurm import Slurm as slurmModel
 from girder_slurm import utils as slurmUtils
@@ -85,3 +99,4 @@ job['kwargs'] = {
 job = Job().save(job)
 # Schedule to start slurm job which will trigger slurm handler to submit sbatch
 slurmModel().scheduleSlurm(job)
+```
