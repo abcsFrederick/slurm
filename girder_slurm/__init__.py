@@ -26,6 +26,7 @@ SettingDefault.defaults.update({
 class SlurmPlugin(plugin.GirderPlugin):
     DISPLAY_NAME = 'Slurm'
     CLIENT_SOURCE_PATH = 'web_client'
+
     def load(self, info):
         info['apiRoot'].slurm = rest.Slurm()
         SlurmModel()

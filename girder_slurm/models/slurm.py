@@ -62,6 +62,20 @@ class Slurm(AccessControlledModel):
 
         slurmOptions = self.findOne({'user': user['_id']})
 
+        if slurmOptions is None:
+            slurmOptions = {
+                'user': user['_id'],
+                'partition': 'gpuib',
+                'gres': "gpu:4",
+                'nodes': 1,
+                'ntasks': 1,
+                'cpu_per_task': 1,
+                'mem_per_cpu': 16,
+                'time': 1,
+                'modules': ""
+            }
+            self.save(slurmOptions)
+
         otherFields = {
             'otherFields': {
                 'slurm_info': {
@@ -151,7 +165,7 @@ class Slurm(AccessControlledModel):
         if self.findOne({'user': user['_id']}) is None:
             doc = {
                 'user': user['_id'],
-                'partition': 'norm',
+                'partition': 'gpuib',
                 'gres': "",
                 'nodes': 1,
                 'ntasks': 1,
