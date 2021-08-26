@@ -8,9 +8,9 @@ from time import sleep
 
 from girder import events
 from girder.models.setting import Setting
-from girder.plugins.jobs.constants import JobStatus
-from girder.plugins.jobs.models.job import Job
-import girder_io.output as girderOutput
+from girder_jobs.constants import JobStatus
+from girder_jobs.models.job import Job
+import girder_slurm.girder_io.output as girderOutput
 
 from .constants import PluginSettings
 
@@ -54,6 +54,8 @@ def schedule(event):
 #SBATCH --output={shared_partition_log}/slurm-%x.%j.out
 #SBATCH --error={shared_partition_log}/slurm-%x.%j.err
 
+source /etc/profile.d/modules.sh
+module load {modules}
 mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 """
         execCommand = """python3.6 {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
@@ -61,7 +63,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             if isinstance(job['kwargs']['inputs'][name]['data'], list):
                 arg = "--" + name + " " + ' '.join('"{0}"'.format(i) for i in job['kwargs']['inputs'][name]['data']) + " "
             else:
-                arg = "--" + name + " '" + str(job['kwargs']['inputs'][name]['data']) + " "
+                arg = "--" + name + " '" + str(job['kwargs']['inputs'][name]['data']) + "' "
             execCommand += arg
         batchscript += execCommand
         script = batchscript.format(name=slurm_info_new['name'],
@@ -70,6 +72,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
                                     ntasks=slurm_info_new['ntasks'],
                                     gres=slurm_info_new['gres'],
                                     mem_per_cpu=slurm_info_new['mem_per_cpu'],
+                                    modules=" ".join(slurm_info_new['modules']),
                                     shared_partition_log=shared_partition_log,
                                     shared_partition_work_directory=shared_partition_work_directory,
                                     pythonScriptPath=pythonScriptPath)
@@ -122,7 +125,7 @@ def loopWatch(slurmJobId):
         output = subprocess.Popen(args,
                                   stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
         out_put = output.communicate()[0]
-        found = re.findall(slurmJobId, out_put)
+        found = re.findall(slurmJobId, out_put.decode())
         if len(found) == 0:
             job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})
             Job().updateJob(job, status=JobStatus.SUCCESS)
@@ -142,7 +145,6 @@ def loopWatch(slurmJobId):
             # _send_to_girder
             slurm_output_name = 'slurm-{}.{}'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
             data = os.path.join(shared_partition_work_directory, slurm_output_name)
-            girderOutput.girderOutputSpec(job, data)
+            girderOutput.sendOutputToGirder(job, data)
             break
-        print('update step')
         sleep(1)

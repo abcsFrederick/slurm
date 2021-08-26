@@ -73,6 +73,8 @@ def fetch_input(spec):
     dest = os.path.join(spec['kwargs']['_tempdir'], spec['name'])
     if resource_type == 'folder':
         client.downloadFolderRecursive(spec['id'], dest)
+    elif resource_type == 'file':
+        client.downloadFile(spec['id'], dest)
     else:
         raise Exception('Invalid resource type: ' + resource_type)
     return dest
@@ -85,7 +87,14 @@ def send_output(job, data):
         parent_type = outputs[output]['parent_type']
         reference = outputs[output]['reference']
         client = _init_client(outputs[output], require_token=True)
-    client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
+    if parent_type == 'folder':
+        client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
+    elif parent_type == 'item':
+        for root, dirs, files in os.walk(data):
+            for file in files:
+                path = os.path.join(root, file)
+                client.uploadFileToItem(parent_id, path, reference=reference)
+
     inputs = json.loads(job['kwargs'])['inputs']
     girderInputSpec = {k: v for k, v in inputs.items() if v['mode'] == 'girder'}
     for input in girderInputSpec:

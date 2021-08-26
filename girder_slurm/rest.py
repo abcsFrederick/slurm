@@ -6,16 +6,16 @@ from girder import events
 from girder.models.setting import Setting
 from girder.models.folder import Folder
 
-from girder.api.rest import Resource
+from girder.api.rest import Resource, filtermodel
 from girder.api.describe import Description, autoDescribeRoute
 from girder.api import access
-from girder.constants import AccessType, TokenScope
+from girder.constants import AccessType, TokenScope, SortDir
 
-from girder.plugins.jobs.models.job import Job
-from girder.plugins.jobs.constants import JobStatus
+from girder_jobs.models.job import Job
+from girder_jobs.constants import JobStatus
 
-import girder_io.input as girderInput
-import girder_io.output as girderOutput
+import girder_slurm.girder_io.input as girderInput
+import girder_slurm.girder_io.output as girderOutput
 from . import event_handlers
 from .constants import PluginSettings
 import datetime
@@ -44,6 +44,7 @@ class Slurm(Resource):
         self._modulesPath = os.path.join(self.SHARED_PARTITION, 'modules')
         self._shellPath = os.path.join(self.SHARED_PARTITION, 'shells')
 
+        self.route('GET', ('lists',), self.listSlurmJobs)
         self.route('GET', ('slurmOption',), self.getSlurmOption)
         self.route('PUT', ('slurmOption',), self.setSlurmOption)
         self.route('GET', (), self.getSlurm)
@@ -52,6 +53,37 @@ class Slurm(Resource):
         self.route('GET', ('settings',), self.getSettings)
         self.route('POST', ('update',), self.update)
         self.route('PUT', ('updatestep',), self.updateStep)
+
+    @access.user
+    @filtermodel(model=SlurmModel)
+    @autoDescribeRoute(
+        Description('List slurm jobs for a given user.')
+        .param('userId', 'The ID of the user whose jobs will be listed. If '
+               'not passed or empty, will use the currently logged in user. If '
+               'set to "None", will list all jobs that do not have an owning '
+               'user.', required=False)
+        .modelParam('parentId', 'Id of the parent job.', model=SlurmModel, level=AccessType.ADMIN,
+                    destName='parentJob', paramType='query', required=False)
+        .jsonParam('types', 'Filter for type', requireArray=True, required=False)
+        .jsonParam('statuses', 'Filter for status', requireArray=True, required=False)
+        .pagingParams(defaultSort='created', defaultSortDir=SortDir.DESCENDING)
+    )
+    def listSlurmJobs(self, userId, parentJob, types, statuses, limit, offset, sort):
+        currentUser = self.getCurrentUser()
+        if not userId:
+            user = currentUser
+        elif userId.lower() == 'none':
+            user = 'none'
+        else:
+            user = User().load(userId, user=currentUser, level=AccessType.READ)
+
+        parent = None
+        if parentJob:
+            parent = parentJob
+
+        return list(SlurmModel().list(
+            user=user, offset=offset, limit=limit, types=types,
+            statuses=statuses, sort=sort, currentUser=currentUser, parentJob=parent))
 
     # for test propose
     @access.public
@@ -96,7 +128,7 @@ class Slurm(Resource):
         doc['ntasks'] = ntasks
         doc['cpu_per_task'] = cpu_per_task
         doc['mem_per_cpu'] = mem_per_cpu
-        doc['time'] = mem_per_cpu
+        doc['time'] = time
         return SlurmModel().save(doc)
     # Find link record based on original item ID or parentId(to check chirdren links)
     # Return only record that have READ access(>=0) to user.
@@ -110,7 +142,7 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def getSlurm(self):
-        hostname = 'miaot2'
+        hostname = 'miaot2' # ncifivgSvc
         out = subprocess.check_output(['squeue', '-u', hostname])
         return out
 
