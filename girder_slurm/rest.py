@@ -142,7 +142,7 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def getSlurm(self):
-        hostname = 'miaot2' # ncifivgSvc
+        hostname = 'miaot2' # ncifivgsvc
         out = subprocess.check_output(['squeue', '-u', hostname])
         return out
 

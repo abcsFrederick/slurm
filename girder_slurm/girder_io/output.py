@@ -5,7 +5,6 @@ from girder_slurm.girder_io import send_output
 
 def sendOutputToGirder(job, data):
     job = send_output(job, data)
-    print ('send finished')
     return job
 
 def girderOutputSpec(parent, token, parentType='folder', name=None,
