@@ -11,5 +11,9 @@ form#g-Slurm-settings-form(role="form")
     label.control-label(for="g-Slurm-settings-CRONTABD") TMP partition for crontab
     //- p.g-Slurm-settings-description
     input#g-Slurm-settings-CRONTAB.input-sm.form-control(type="text", value=settings["slurm.CRONTAB_PARTITION"], title="Crontab monitor partition.", placeholder="Do not change only if you know what you are doing (default /mnt/data/fr-s-ivg-infv-p/tmp/crontab)")
+
+    label.control-label(for="g-Slurm-settings-API_URL") API URL
+    //- p.g-Slurm-settings-description
+    input#g-Slurm-settings-CRONTAB.input-sm.form-control(type="text", value=settings["slurm.API_URL"], title="API URL.", placeholder="Do not change only if you know what you are doing (default localhost:port should be same as current port and IP)")
   p#g-Slurm-settings-error-message.g-validation-failed-message
   input.btn.btn-sm.btn-primary(type="submit", value="Save")
