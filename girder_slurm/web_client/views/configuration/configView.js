@@ -22,6 +22,9 @@ var ConfigView = View.extend({
             }, {
                 key: 'slurm.CRONTAB_PARTITION',
                 value: this.$('#g-Slurm-settings-CRONTAB').val()
+            }, {
+                key: 'slurm.API_URL',
+                value: this.$('#g-Slurm-settings-API_URL').val()
             }]);
         }
     },
