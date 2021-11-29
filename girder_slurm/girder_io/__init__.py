@@ -86,9 +86,10 @@ def send_output(job, data):
         parent_id = outputs[output]['parent_id']
         parent_type = outputs[output]['parent_type']
         reference = outputs[output]['reference']
+        leafFoldersAsItems = json.loads(reference)['leafFoldersAsItems'] if 'leafFoldersAsItems' in json.loads(reference) else True
         client = _init_client(outputs[output], require_token=True)
     if parent_type == 'folder':
-        client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=True)
+        client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=leafFoldersAsItems)
     elif parent_type == 'item':
         for root, dirs, files in os.walk(data):
             for file in files:
@@ -97,7 +98,11 @@ def send_output(job, data):
 
     inputs = json.loads(job['kwargs'])['inputs']
     girderInputSpec = {k: v for k, v in inputs.items() if v['mode'] == 'girder'}
+    localInputSpec = {k: v for k, v in inputs.items() if v['mode'] == 'local'}
     for input in girderInputSpec:
         _tempdir = girderInputSpec[input]['kwargs']['_tempdir']
         shutil.rmtree(_tempdir)
+    for input in localInputSpec:
+        dataPathOnHPC = localInputSpec[input]['data']
+        shutil.rmtree(dataPathOnHPC)
     return job

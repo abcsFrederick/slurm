@@ -20,7 +20,7 @@ def validateString(doc):
 SettingDefault.defaults.update({
     PluginSettings.SHARED_PARTITION: '/Your_mount_partition', # hostname
     PluginSettings.CRONTAB_PARTITION: '/Your_crontab_partition_on_girder_server', # hostname
-    PluginSettings.API_URL: 'http://localhost:8888/api/v1'
+    PluginSettings.API_URL: 'http://localhost:8090/api/v1'
 })
 
 class SlurmPlugin(plugin.GirderPlugin):
