@@ -49,9 +49,9 @@ class Slurm(AccessControlledModel):
         slurm_jobs = [x for x in jobs if x['handler'] == 'slurm_handler']
 
         return slurm_jobs
-    def createJob(self, title, type, taskName, taskEntry, modules="", args=(), kwargs=None, user=None, when=None,
+    def createJob(self, title, type, taskName, taskEntry, modules="", requirements=None, args=(), kwargs=None, user=None, when=None,
                   interval=0, public=False, handler=None, asynchronous=False,
-                  save=True, parentJob=None, otherFields=None):
+                  save=True, parentJob=None, otherFields=None, env=None):
         now = datetime.datetime.utcnow()
 
         if when is None:
@@ -65,14 +65,14 @@ class Slurm(AccessControlledModel):
         if slurmOptions is None:
             slurmOptions = {
                 'user': user['_id'],
-                'partition': 'gpuib',
-                'gres': "gpu:4",
+                'partition': 'gpu',
+                'gres': "gpu:1",
                 'nodes': 1,
                 'ntasks': 1,
                 'cpu_per_task': 1,
                 'mem_per_cpu': 16,
                 'time': 1,
-                'modules': ""
+                'modules': "",
             }
             self.save(slurmOptions)
 
@@ -92,6 +92,10 @@ class Slurm(AccessControlledModel):
                 }
             }
         }
+        if requirements:
+            otherFields['otherFields']['slurm_info']['requirements'] = requirements
+        if env:
+            otherFields['otherFields']['slurm_info']['env'] = env
         parentId = None
         if parentJob:
             parentId = parentJob['_id']
@@ -163,15 +167,20 @@ class Slurm(AccessControlledModel):
     def _createSlurmConfiguration(self, event):
         user = event.info
         if self.findOne({'user': user['_id']}) is None:
+            if settings.get(PluginSettings.SLURM_PARTITION) == 'GPU':
+                gres = 'gpu:1'
+            else:
+                gres = ''
+
             doc = {
                 'user': user['_id'],
-                'partition': 'gpuib',
-                'gres': "",
-                'nodes': 1,
-                'ntasks': 1,
-                'cpu_per_task': 1,
-                'mem_per_cpu': 16,
-                'time': 1,
+                'partition': settings.get(PluginSettings.SLURM_PARTITION),
+                'gres': gres,
+                'nodes': settings.get(PluginSettings.SLURM_NODES),
+                'ntasks': settings.get(PluginSettings.SLURM_TASKS),
+                'cpu_per_task': settings.get(PluginSettings.SLURM_TASKS),
+                'mem_per_cpu': settings.get(PluginSettings.SLURM_CPU),
+                'time': settings.get(PluginSettings.SLURM_TIME),
                 'modules': ""
             }
             self.save(doc)

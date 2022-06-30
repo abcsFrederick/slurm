@@ -25,6 +25,24 @@ var ConfigView = View.extend({
             }, {
                 key: 'slurm.API_URL',
                 value: this.$('#g-Slurm-settings-API_URL').val()
+            }, {
+                key: 'slurm.PARTITION',
+                value: this.$('#g-Slurm-settings-PARTITION').val()
+            }, {
+                key: 'slurm.NODES',
+                value: this.$('#g-Slurm-settings-NODES').val()
+            }, {
+                key: 'slurm.TASKS',
+                value: this.$('#g-Slurm-settings-TASKS').val()
+            }, {
+                key: 'slurm.CPU',
+                value: this.$('#g-Slurm-settings-CPU').val()
+            }, {
+                key: 'slurm.MEMERY',
+                value: this.$('#g-Slurm-settings-MEMERY').val()
+            }, {
+                key: 'slurm.TIME',
+                value: this.$('#g-Slurm-settings-TIME').val()
             }]);
         }
     },
@@ -37,6 +55,7 @@ var ConfigView = View.extend({
     },
 
     render: function () {
+        console.log(this.settings)
         this.$el.html(ConfigViewTemplate({
             settings: this.settings
         }));

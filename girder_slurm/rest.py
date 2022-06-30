@@ -1,5 +1,6 @@
 from bson import ObjectId
 import os
+import re
 import subprocess
 from subprocess import PIPE, Popen
 from girder import events
@@ -51,6 +52,7 @@ class Slurm(Resource):
         self.route('PUT', ('cancel', ':id'), self.cancelSlurm)
         self.route('POST', (), self.submitSlurmJob)
         self.route('GET', ('settings',), self.getSettings)
+        self.route('GET', ('modules',), self.getModules)
         self.route('POST', ('update',), self.update)
         self.route('PUT', ('updatestep',), self.updateStep)
 
@@ -112,7 +114,7 @@ class Slurm(Resource):
     @access.public
     @autoDescribeRoute(
         Description('Search for segmentation by certain properties.')
-        .param('partition', 'Partition.', required=True, enum=['quick', 'norm', 'gpu'])
+        .param('partition', 'Partition.', required=True, enum=['short', 'norm', 'gpu', 'unlimited', 'largemem'])
         .param('gres', 'Generic Resource (GRES) Scheduling.', required=False)
         .param('nodes', 'Node count required for the job.', required=True, dataType='integer')
         .param('ntasks', 'Number of task.', required=True, dataType='integer')
@@ -142,9 +144,50 @@ class Slurm(Resource):
         .errorResponse('Read access was denied on the parent resource.', 403)
     )
     def getSlurm(self):
-        hostname = 'miaot2' # ncifivgsvc
+        hostname = 'ncifivgsvc'
         out = subprocess.check_output(['squeue', '-u', hostname])
         return out
+
+    @access.public
+    @autoDescribeRoute(
+        Description('List all available modules that FRCE provided.')
+        .errorResponse()
+        .errorResponse('Read access was denied on the parent resource.', 403)
+    )
+    def getModules(self):
+        outputFile = os.path.join(self._shared_partition_log, 'getModule.log')
+        batchscript = """#!/bin/bash
+#SBATCH --partition=short
+#SBATCH --job-name=getModule
+
+#SBATCH --output={outputFile}
+
+source /etc/profile.d/modules.sh
+module avail"""
+        script = batchscript.format(outputFile=outputFile)
+        shellScriptPath = os.path.join(self._shellPath, 'getModule.sh')
+        with open(shellScriptPath, "w") as sh:
+            sh.write(script)
+        try:
+            args = ['sbatch']
+            args.append(sh.name)
+            res = subprocess.check_output(args).strip()
+            if not res.startswith(b"Submitted batch"):
+                return None
+            slurmJobId = str(int(res.split()[-1]))
+        except Exception:
+            return 'something wrong during slurm start'
+        while True:
+            args = 'squeue -j {}'.format(slurmJobId)
+            output = subprocess.Popen(args,
+                                      stdout=subprocess.PIPE, stderr=subprocess.PIPE, shell=True)
+            out_put = output.communicate()[0]
+            found = re.findall(slurmJobId, out_put.decode())
+            if len(found) == 0:
+                f = open(outputFile, "r")
+                content = f.read()
+                # To remove first line -----/mnt/nasapps/modules/modulefiles-----
+                return content.split()[3:]
 
     @access.public
     @autoDescribeRoute(
@@ -279,7 +322,21 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             PluginSettings.SHARED_PARTITION:
                 settings.get(PluginSettings.SHARED_PARTITION),
             PluginSettings.CRONTAB_PARTITION:
-                settings.get(PluginSettings.CRONTAB_PARTITION)
+                settings.get(PluginSettings.CRONTAB_PARTITION),
+            PluginSettings.API_URL:
+                settings.get(PluginSettings.API_URL),
+            PluginSettings.SLURM_CPU:
+                settings.get(PluginSettings.SLURM_CPU),
+            PluginSettings.SLURM_PARTITION:
+                settings.get(PluginSettings.SLURM_PARTITION),
+            PluginSettings.SLURM_NODES:
+                settings.get(PluginSettings.SLURM_NODES),
+            PluginSettings.SLURM_TASKS:
+                settings.get(PluginSettings.SLURM_TASKS),
+            PluginSettings.SLURM_MEMERY:
+                settings.get(PluginSettings.SLURM_MEMERY),
+            PluginSettings.SLURM_TIME:
+                settings.get(PluginSettings.SLURM_TIME)
             }
 
     @access.public

@@ -103,6 +103,8 @@ def send_output(job, data):
         _tempdir = girderInputSpec[input]['kwargs']['_tempdir']
         shutil.rmtree(_tempdir)
     for input in localInputSpec:
-        dataPathOnHPC = localInputSpec[input]['data']
-        shutil.rmtree(dataPathOnHPC)
+        # Only remove input temp directory and leave training weight if there is any
+        if input == 'input':
+            dataPathOnHPC = localInputSpec[input]['data']
+            shutil.rmtree(dataPathOnHPC)
     return job

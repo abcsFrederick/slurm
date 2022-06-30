@@ -3,6 +3,7 @@ import subprocess
 import datetime
 import sys, os
 import re
+import traceback
 from crontab import CronTab
 from time import sleep
 
@@ -38,6 +39,7 @@ def schedule(event):
         settings = Setting()
         SHARED_PARTITION = settings.get(PluginSettings.SHARED_PARTITION)
         shared_partition_log = os.path.join(SHARED_PARTITION, 'logs')
+        shared_partition_env_directory = os.path.join(SHARED_PARTITION, 'env')
         shared_partition_work_directory = os.path.join(SHARED_PARTITION, 'tmp')
         modulesPath = os.path.join(SHARED_PARTITION, 'modules')
         pythonScriptPath = os.path.join(modulesPath, slurm_info_new['entry'])
@@ -58,6 +60,22 @@ source /etc/profile.d/modules.sh
 module load {modules}
 mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
 """
+        if 'requirements' in job['kwargs']:
+            pipCommand = """virtualenv-3.6 {shared_partition_env_directory}/{slurm_info_new_name} --system-site-packages
+source {shared_partition_env_directory}/{slurm_info_new_name}/bin/activate
+pip install -r {requirements}
+"""
+            pipScript = pipCommand.format(shared_partition_env_directory=shared_partition_env_directory,
+                              slurm_info_new_name=slurm_info_new['name'],
+                              requirements=slurm_info_new['requirements'])
+
+            batchscript += pipScript
+        if 'env' in job['kwargs']:
+            pipCommand = """source {env}/bin/activate
+"""
+            pipScript = pipCommand.format(env=slurm_info_new['env'])
+
+            batchscript += pipScript
         execCommand = """python3.6 {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
         for name in job['kwargs']['inputs']:
             if isinstance(job['kwargs']['inputs'][name]['data'], list):
@@ -65,6 +83,7 @@ mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
             else:
                 arg = "--" + name + " '" + str(job['kwargs']['inputs'][name]['data']) + "' "
             execCommand += arg
+
         batchscript += execCommand
         script = batchscript.format(name=slurm_info_new['name'],
                                     partition=slurm_info_new['partition'],
@@ -128,7 +147,6 @@ def loopWatch(slurmJobId):
         found = re.findall(slurmJobId, out_put.decode())
         if len(found) == 0:
             job = Job().findOne({'otherFields.slurm_info.slurm_id': int(slurmJobId)})
-            Job().updateJob(job, status=JobStatus.SUCCESS)
             log_file_name = 'slurm-{}.{}.out'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
             log_file_path = os.path.join(shared_partition_log, log_file_name)
             f = open(log_file_path, "r")
@@ -137,6 +155,9 @@ def loopWatch(slurmJobId):
             f.close()
             err_file_name = 'slurm-{}.{}.err'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
             err_file_path = os.path.join(shared_partition_log, err_file_name)
+            job['otherFields']['slurm_info']['log'] = {}
+            job['otherFields']['slurm_info']['log']['error'] = err_file_path
+            job['otherFields']['slurm_info']['log']['out'] = err_file_path
             f = open(err_file_path, "r")
             content = f.read()
             Job().updateJob(job, log=content)
@@ -144,7 +165,13 @@ def loopWatch(slurmJobId):
             # Job().save(job)
             # _send_to_girder
             slurm_output_name = 'slurm-{}.{}'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
+            
             data = os.path.join(shared_partition_work_directory, slurm_output_name)
-            girderOutput.sendOutputToGirder(job, data)
+            try:
+                girderOutput.sendOutputToGirder(job, data)
+                Job().updateJob(job, status=JobStatus.SUCCESS)
+            except Exception:
+                Job().updateJob(job, status=JobStatus.ERROR)
+                print(traceback.format_exc())
             break
         sleep(1)

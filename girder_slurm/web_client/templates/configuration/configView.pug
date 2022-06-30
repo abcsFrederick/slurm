@@ -8,12 +8,36 @@ form#g-Slurm-settings-form(role="form")
     p.g-Slurm-settings-description
     input#g-Slurm-settings-SHARED.input-sm.form-control(type="text", value=settings["slurm.SHARED_PARTITION"], title="SHARED PARTITION path in Slurm.", placeholder="Do not change only if you know what you are doing (default /mnt/hpc/webdata/server/fr-s-ivg-ssr-d1)")
 
-    label.control-label(for="g-Slurm-settings-CRONTABD") TMP partition for crontab
+    label.control-label(for="g-Slurm-settings-CRONTABD") TEMP partition for crontab
     //- p.g-Slurm-settings-description
     input#g-Slurm-settings-CRONTAB.input-sm.form-control(type="text", value=settings["slurm.CRONTAB_PARTITION"], title="Crontab monitor partition.", placeholder="Do not change only if you know what you are doing (default /mnt/data/fr-s-ivg-infv-p/tmp/crontab)")
 
     label.control-label(for="g-Slurm-settings-API_URL") API URL
     //- p.g-Slurm-settings-description
-    input#g-Slurm-settings-CRONTAB.input-sm.form-control(type="text", value=settings["slurm.API_URL"], title="API URL.", placeholder="Do not change only if you know what you are doing (default localhost:port should be same as current port and IP)")
+    input#g-Slurm-settings-API_URL.input-sm.form-control(type="text", value=settings["slurm.API_URL"], title="API URL.", placeholder="Do not change only if you know what you are doing (default localhost:port should be same as current port and IP)")
+
+    label.control-label(for="g-Slurm-settings-PARTITION") Slurm Resource Partition
+    //- p.g-Slurm-settings-description
+    select#g-Slurm-settings-PARTITION.input-sm.form-control
+      each partition in ['gpu', 'short', 'norm', 'unlimited', 'largemem']
+        if partition == settings["slurm.PARTITION"]
+          option(value=partition selected) #{partition}
+        else
+          option(value=partition) #{partition}
+
+    label.control-label(for="g-Slurm-settings-NODES") Number of nodes
+    input#g-Slurm-settings-NODES.input-sm.form-control(type="text", value=settings["slurm.NODES"], title="Number of nodes.", placeholder="Number of nodes")
+
+    label.control-label(for="g-Slurm-settings-TASKS") Number of tasks
+    input#g-Slurm-settings-TASKS.input-sm.form-control(type="text", value=settings["slurm.TASKS"], title="Number of tasks.", placeholder="Number of tasks")
+
+    label.control-label(for="g-Slurm-settings-CPU") CPU per task
+    input#g-Slurm-settings-CPU.input-sm.form-control(type="text", value=settings["slurm.CPU"], title="Number of tasks.", placeholder="Number of tasks")
+
+    label.control-label(for="g-Slurm-settings-MEMERY") Memery per cpu
+    input#g-Slurm-settings-MEMERY.input-sm.form-control(type="text", value=settings["slurm.MEMERY"], title="Number of tasks.", placeholder="Number of tasks")
+
+    label.control-label(for="g-Slurm-settings-TIME") Time limit(hr)
+    input#g-Slurm-settings-TIME.input-sm.form-control(type="text", value=settings["slurm.TIME"], title="Time limit.", placeholder="Time limit")
   p#g-Slurm-settings-error-message.g-validation-failed-message
   input.btn.btn-sm.btn-primary(type="submit", value="Save")
