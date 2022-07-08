@@ -79,22 +79,25 @@ def fetch_input(spec):
         raise Exception('Invalid resource type: ' + resource_type)
     return dest
 
-def send_output(job, data):
+def send_output(job, outputDir):
     resource_type = job.get('resource_type', 'file').lower()
     outputs = json.loads(job['kwargs'])['outputs']
-    for output in outputs:
-        parent_id = outputs[output]['parent_id']
-        parent_type = outputs[output]['parent_type']
-        reference = outputs[output]['reference']
+
+    for subfolder in outputs:
+        parent_id = outputs[subfolder]['parent_id']
+        parent_type = outputs[subfolder]['parent_type']
+        reference = outputs[subfolder]['reference']
         leafFoldersAsItems = json.loads(reference)['leafFoldersAsItems'] if 'leafFoldersAsItems' in json.loads(reference) else True
-        client = _init_client(outputs[output], require_token=True)
-    if parent_type == 'folder':
-        client.upload(data, parent_id, parent_type, reference=reference, leafFoldersAsItems=leafFoldersAsItems)
-    elif parent_type == 'item':
-        for root, dirs, files in os.walk(data):
-            for file in files:
-                path = os.path.join(root, file)
-                client.uploadFileToItem(parent_id, path, reference=reference)
+        client = _init_client(outputs[subfolder], require_token=True)
+        if parent_type == 'folder':
+            client.upload(outputDir, parent_id, parent_type, reference=reference, leafFoldersAsItems=leafFoldersAsItems)
+        elif parent_type == 'item':
+            subPath = os.path.join(outputDir, subfolder)
+            print(subPath)
+            for root, dirs, files in os.walk(subPath):
+                for file in files:
+                    path = os.path.join(root, file)
+                    client.uploadFileToItem(parent_id, path, reference=reference)
 
     inputs = json.loads(job['kwargs'])['inputs']
     girderInputSpec = {k: v for k, v in inputs.items() if v['mode'] == 'girder'}

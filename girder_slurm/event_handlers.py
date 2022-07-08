@@ -166,9 +166,9 @@ def loopWatch(slurmJobId):
             # _send_to_girder
             slurm_output_name = 'slurm-{}.{}'.format(job['otherFields']['slurm_info']['name'], slurmJobId)
             
-            data = os.path.join(shared_partition_work_directory, slurm_output_name)
+            outputDir = os.path.join(shared_partition_work_directory, slurm_output_name)
             try:
-                girderOutput.sendOutputToGirder(job, data)
+                girderOutput.sendOutputToGirder(job, outputDir)
                 Job().updateJob(job, status=JobStatus.SUCCESS)
             except Exception:
                 Job().updateJob(job, status=JobStatus.ERROR)
