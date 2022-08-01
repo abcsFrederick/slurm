@@ -51,7 +51,7 @@ class Slurm(AccessControlledModel):
         return slurm_jobs
     def createJob(self, title, type, taskName, taskEntry, modules="", requirements=None, args=(), kwargs=None, user=None, when=None,
                   interval=0, public=False, handler=None, asynchronous=False,
-                  save=True, parentJob=None, otherFields=None, env=None):
+                  save=True, parentJob=None, otherFields=None, env=None, mem=None):
         now = datetime.datetime.utcnow()
 
         if when is None:
@@ -75,6 +75,8 @@ class Slurm(AccessControlledModel):
                 'modules': "",
             }
             self.save(slurmOptions)
+        if mem:
+            slurmOptions['mem_per_cpu'] = mem
 
         otherFields = {
             'otherFields': {
