@@ -38,7 +38,7 @@ class Slurm(AccessControlledModel):
             'progress', 'log', 'meta', '_id', 'public', 'parentId', 'async',
             'updated', 'timestamps', 'handler', 'jobInfoSpec', 'otherFields')
         self.exposeFields(AccessType.READ, fields)
-        events.bind('model.user.save.created', 'slurm', self._createSlurmConfiguration)
+        # events.bind('model.user.save.created', 'slurm', self._createSlurmConfiguration)
 
     def list(self, user=None, types=None, statuses=None,
              limit=0, offset=0, sort=None, currentUser=None, parentJob=None):
@@ -166,23 +166,24 @@ class Slurm(AccessControlledModel):
                 raise ValidationException(message, field)
         return doc
 
-    def _createSlurmConfiguration(self, event):
-        user = event.info
-        if self.findOne({'user': user['_id']}) is None:
-            if settings.get(PluginSettings.SLURM_PARTITION) == 'GPU':
-                gres = 'gpu:1'
-            else:
-                gres = ''
+    # Todo: GPU resource move to task based
+    # def _createSlurmConfiguration(self, event):
+    #     user = event.info
+    #     if self.findOne({'user': user['_id']}) is None:
+    #         if settings.get(PluginSettings.SLURM_PARTITION) == 'GPU':
+    #             gres = 'gpu:1'
+    #         else:
+    #             gres = ''
 
-            doc = {
-                'user': user['_id'],
-                'partition': settings.get(PluginSettings.SLURM_PARTITION),
-                'gres': gres,
-                'nodes': settings.get(PluginSettings.SLURM_NODES),
-                'ntasks': settings.get(PluginSettings.SLURM_TASKS),
-                'cpu_per_task': settings.get(PluginSettings.SLURM_TASKS),
-                'mem_per_cpu': settings.get(PluginSettings.SLURM_CPU),
-                'time': settings.get(PluginSettings.SLURM_TIME),
-                'modules': ""
-            }
-            self.save(doc)
+    #         doc = {
+    #             'user': user['_id'],
+    #             'partition': settings.get(PluginSettings.SLURM_PARTITION),
+    #             'gres': gres,
+    #             'nodes': settings.get(PluginSettings.SLURM_NODES),
+    #             'ntasks': settings.get(PluginSettings.SLURM_TASKS),
+    #             'cpu_per_task': settings.get(PluginSettings.SLURM_TASKS),
+    #             'mem_per_cpu': settings.get(PluginSettings.SLURM_CPU),
+    #             'time': settings.get(PluginSettings.SLURM_TIME),
+    #             'modules': ""
+    #         }
+    #         self.save(doc)
