@@ -66,11 +66,11 @@ class Slurm(AccessControlledModel):
         slurmOptions = {
             'user': user['_id'],
             'partition': 'gpu',
-            'gres': "gpu:1",
+            'gres': "gpu:4",
             'nodes': 1,
             'ntasks': 1,
             'cpu_per_task': 1,
-            'mem_per_cpu': 16,
+            'mem_per_cpu': 32,
             'time': 1,
             'modules': "",
         }
