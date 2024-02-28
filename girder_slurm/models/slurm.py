@@ -128,7 +128,6 @@ class Slurm(AccessControlledModel):
             self.setUserAccess(job, user=user, level=AccessType.ADMIN)
         else:
             job['userId'] = None
-
         if save:
             job = JobModel().save(job)
         if user:
@@ -140,7 +139,6 @@ class Slurm(AccessControlledModel):
                 expires=datetime.datetime.utcnow() + datetime.timedelta(seconds=30))
 
             job['kwargs'] = deserialized_kwargs
-
         return job
     def scheduleSlurm(self, job):
         """

@@ -46,6 +46,7 @@ def schedule(event):
 
         Job().updateJob(job, status=JobStatus.QUEUED)
 
+        # if openslide is used the dependencies libpng needs to be export
         batchscript = """#!/bin/bash
 #SBATCH --partition={partition}
 #SBATCH --job-name={name}
@@ -56,6 +57,7 @@ def schedule(event):
 #SBATCH --output={shared_partition_log}/slurm-%x.%j.out
 #SBATCH --error={shared_partition_log}/slurm-%x.%j.err
 
+export LD_LIBRARY_PATH=/mnt/hpc/webdata/server/fsivgl-histo01p/dependencies/lib64:$LD_LIBRARY_PATH
 source /etc/profile.d/modules.sh
 module load {modules}
 mkdir -p {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID
@@ -70,13 +72,13 @@ pip install -r {requirements}
                               requirements=slurm_info_new['requirements'])
 
             batchscript += pipScript
-        if 'env' in job['kwargs']:
-            pipCommand = """source {env}/bin/activate
+        if 'env' in slurm_info_new:
+            pipCommand = """source {shared_partition_env_directory}/{env}/bin/activate
 """
-            pipScript = pipCommand.format(env=slurm_info_new['env'])
+            pipScript = pipCommand.format(shared_partition_env_directory=shared_partition_env_directory, env=slurm_info_new['env'])
 
             batchscript += pipScript
-        execCommand = """python3.6 {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
+        execCommand = """python {pythonScriptPath} --directory {shared_partition_work_directory}/slurm-$SLURM_JOB_NAME.$SLURM_JOB_ID """
         for name in job['kwargs']['inputs']:
             if isinstance(job['kwargs']['inputs'][name]['data'], list):
                 arg = "--" + name + " " + ' '.join('"{0}"'.format(i) for i in job['kwargs']['inputs'][name]['data']) + " "
